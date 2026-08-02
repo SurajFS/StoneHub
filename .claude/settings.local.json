@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://api.nuget.org/v3-flatcontainer/microsoft.openapi/index.json)",
+      "Bash(dotnet add *)",
+      "Bash(dotnet build *)"
+    ]
+  }
+}
