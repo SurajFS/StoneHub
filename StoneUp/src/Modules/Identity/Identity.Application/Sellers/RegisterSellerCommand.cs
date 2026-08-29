@@ -9,4 +9,6 @@ public sealed record RegisterSellerCommand(
     string Password,
     string CompanyName,
     string City,
-    string State) : IRequest<Result<AuthResultDto>>;
+    string State,
+    string Phone,
+    string? WhatsAppNumber) : IRequest<Result<AuthResultDto>>;

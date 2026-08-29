@@ -2,11 +2,17 @@ using Catalog.Application;
 using Catalog.Application.Dtos;
 using Catalog.Domain;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace Catalog.Infrastructure.Persistence;
 
 public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQueryService
 {
+    // Queries bypass the FluentValidation pipeline, so paging inputs are clamped here to
+    // avoid a caller requesting page 0 or an unbounded page size.
+    private const int DefaultPageSize = 20;
+    private const int MaxPageSize = 100;
+
     public async Task<ProductDto?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await dbContext.Products
             .AsNoTracking()
@@ -14,8 +20,11 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
             .Select(ProjectToDto())
             .FirstOrDefaultAsync(ct);
 
-    public async Task<IReadOnlyList<ProductDto>> SearchAsync(ProductSearchFilter filter, CancellationToken ct = default)
+    public async Task<PagedResult<ProductDto>> SearchAsync(ProductSearchFilter filter, CancellationToken ct = default)
     {
+        var page = Math.Max(1, filter.Page);
+        var pageSize = Math.Clamp(filter.PageSize <= 0 ? DefaultPageSize : filter.PageSize, 1, MaxPageSize);
+
         var query = dbContext.Products.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(filter.MaterialType) &&
@@ -33,12 +42,16 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
         if (filter.MaxPrice.HasValue)
             query = query.Where(p => p.Price.Amount <= filter.MaxPrice.Value);
 
-        return await query
+        var total = await query.CountAsync(ct);
+
+        var items = await query
             .OrderByDescending(p => p.CreatedAt)
-            .Skip((filter.Page - 1) * filter.PageSize)
-            .Take(filter.PageSize)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(ProjectToDto())
             .ToListAsync(ct);
+
+        return new PagedResult<ProductDto>(items, total, page, pageSize);
     }
 
     public async Task<IReadOnlyList<ProductDto>> GetBySellerAsync(Guid sellerId, CancellationToken ct = default) =>

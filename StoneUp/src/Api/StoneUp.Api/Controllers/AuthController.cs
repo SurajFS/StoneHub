@@ -15,7 +15,14 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> RegisterSeller(RegisterSellerRequest request, CancellationToken ct)
     {
         var result = await mediator.Send(
-            new RegisterSellerCommand(request.Email, request.Password, request.CompanyName, request.City, request.State),
+            new RegisterSellerCommand(
+                request.Email,
+                request.Password,
+                request.CompanyName,
+                request.City,
+                request.State,
+                request.Phone,
+                request.WhatsAppNumber),
             ct);
 
         return result.ToActionResult();
@@ -39,7 +46,14 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
     }
 }
 
-public sealed record RegisterSellerRequest(string Email, string Password, string CompanyName, string City, string State);
+public sealed record RegisterSellerRequest(
+    string Email,
+    string Password,
+    string CompanyName,
+    string City,
+    string State,
+    string Phone,
+    string? WhatsAppNumber);
 
 public sealed record RegisterBuyerRequest(string Email, string Password, string DisplayName, BuyerType BuyerType, string City);
 

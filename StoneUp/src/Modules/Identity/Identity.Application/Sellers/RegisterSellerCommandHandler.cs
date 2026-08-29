@@ -19,7 +19,8 @@ public sealed class RegisterSellerCommandHandler(
             return Result.Failure<AuthResultDto>(userResult);
 
         var location = Location.Create(request.City, request.State);
-        var sellerProfile = SellerProfile.Register(userResult.Value, request.CompanyName, location);
+        var sellerProfile = SellerProfile.Register(
+            userResult.Value, request.CompanyName, location, request.Phone, request.WhatsAppNumber);
 
         sellerProfileRepository.Add(sellerProfile);
         await sellerProfileRepository.SaveChangesAsync(ct);

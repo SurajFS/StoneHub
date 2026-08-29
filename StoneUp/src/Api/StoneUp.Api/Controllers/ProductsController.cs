@@ -4,6 +4,7 @@ using Catalog.Application.Products;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel;
 
 namespace StoneUp.Api.Controllers;
 
@@ -12,7 +13,7 @@ namespace StoneUp.Api.Controllers;
 public sealed class ProductsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ProductDto>>> Search(
+    public async Task<ActionResult<PagedResult<ProductDto>>> Search(
         [FromQuery] string? materialType,
         [FromQuery] string? keyword,
         [FromQuery] decimal? minPrice,
