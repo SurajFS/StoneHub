@@ -1,0 +1,18 @@
+## .NET build output
+bin/
+obj/
+
+## Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+## Test results
+[Tt]est[Rr]esults/
+*.trx
+
+## OS cruft
+.DS_Store
+Thumbs.db
