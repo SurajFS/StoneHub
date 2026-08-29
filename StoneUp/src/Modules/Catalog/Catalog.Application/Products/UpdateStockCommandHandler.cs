@@ -13,6 +13,9 @@ public sealed class UpdateStockCommandHandler(IProductRepository productReposito
         if (product is null)
             return Result.Failure("Product not found.");
 
+        if (product.SellerId != request.CallerSellerId)
+            return Result.Failure("You do not have permission to modify this listing.");
+
         product.UpdateStock(request.QuantityAvailable);
         await productRepository.SaveChangesAsync(ct);
 

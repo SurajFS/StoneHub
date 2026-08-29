@@ -41,6 +41,14 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
             .ToListAsync(ct);
     }
 
+    public async Task<IReadOnlyList<ProductDto>> GetBySellerAsync(Guid sellerId, CancellationToken ct = default) =>
+        await dbContext.Products
+            .AsNoTracking()
+            .Where(p => p.SellerId == sellerId)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(ProjectToDto())
+            .ToListAsync(ct);
+
     private static System.Linq.Expressions.Expression<Func<Product, ProductDto>> ProjectToDto() => p => new ProductDto(
         p.Id,
         p.SellerId,

@@ -18,6 +18,14 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
 
         builder.HasDefaultSchema("identity");
 
+        builder.Entity<ApplicationUser>(b => b.ToTable("Users"));
+        builder.Entity<IdentityRole<Guid>>(b => b.ToTable("Roles"));
+        builder.Entity<IdentityUserRole<Guid>>(b => b.ToTable("UserRoles"));
+        builder.Entity<IdentityUserClaim<Guid>>(b => b.ToTable("UserClaims"));
+        builder.Entity<IdentityUserLogin<Guid>>(b => b.ToTable("UserLogins"));
+        builder.Entity<IdentityUserToken<Guid>>(b => b.ToTable("UserTokens"));
+        builder.Entity<IdentityRoleClaim<Guid>>(b => b.ToTable("RoleClaims"));
+
         builder.ApplyConfiguration(new SellerProfileConfiguration());
         builder.ApplyConfiguration(new BuyerProfileConfiguration());
     }

@@ -9,4 +9,5 @@ public interface IProductQueryService
 {
     Task<ProductDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<IReadOnlyList<ProductDto>> SearchAsync(ProductSearchFilter filter, CancellationToken ct = default);
+    Task<IReadOnlyList<ProductDto>> GetBySellerAsync(Guid sellerId, CancellationToken ct = default);
 }

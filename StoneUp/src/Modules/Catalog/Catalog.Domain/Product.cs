@@ -67,6 +67,25 @@ public sealed class Product : AggregateRoot<Guid>
 
     public void AddMedia(ProductMedia media) => _media.Add(media);
 
+    public void UpdateDetails(
+        string title,
+        MaterialType materialType,
+        string size,
+        string thickness,
+        string finish,
+        Money price)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title is required.", nameof(title));
+
+        Title = title.Trim();
+        MaterialType = materialType;
+        Size = size;
+        Thickness = thickness;
+        Finish = finish;
+        Price = price;
+    }
+
     public void UpdateStock(decimal quantityAvailable)
     {
         if (quantityAvailable < 0)

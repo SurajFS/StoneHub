@@ -9,3 +9,4 @@ C:\Intel\Codebase\My Projects\StoneUp\StoneUp\src\BuildingBlocks\SharedKernel\ob
 C:\Intel\Codebase\My Projects\StoneUp\StoneUp\src\BuildingBlocks\SharedKernel\obj\Debug\net10.0\refint\SharedKernel.dll
 C:\Intel\Codebase\My Projects\StoneUp\StoneUp\src\BuildingBlocks\SharedKernel\obj\Debug\net10.0\SharedKernel.pdb
 C:\Intel\Codebase\My Projects\StoneUp\StoneUp\src\BuildingBlocks\SharedKernel\obj\Debug\net10.0\ref\SharedKernel.dll
+C:\Intel\Codebase\My Projects\StoneUp\StoneUp\src\BuildingBlocks\SharedKernel\obj\Debug\net10.0\SharedKernel.csproj.AssemblyReference.cache

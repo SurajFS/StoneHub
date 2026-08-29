@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "/KiTu13pmIQ=",
+  "dgSpecHash": "Mu/KbnKtxfk=",
   "success": true,
   "projectFilePath": "C:\\Intel\\Codebase\\My Projects\\StoneUp\\StoneUp\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\hp\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mediatr\\12.4.1\\mediatr.12.4.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
