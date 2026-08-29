@@ -12,7 +12,7 @@ public sealed class LoginCommandHandler(
     {
         var credentialsResult = await identityService.ValidateCredentialsAsync(request.Email, request.Password, ct);
         if (credentialsResult.IsFailure)
-            return Result.Failure<AuthResultDto>(credentialsResult.Error!);
+            return Result.Failure<AuthResultDto>(credentialsResult);
 
         var credentials = credentialsResult.Value;
         var token = jwtTokenService.GenerateToken(credentials.UserId, credentials.Email, credentials.Role);

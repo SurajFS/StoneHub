@@ -3,11 +3,15 @@ using Identity.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
+using StoneUp.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services
     .AddIdentityModule(builder.Configuration)
@@ -16,6 +20,8 @@ builder.Services
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

@@ -12,7 +12,7 @@ public sealed class IdentityService(
     {
         var existing = await userManager.FindByEmailAsync(email);
         if (existing is not null)
-            return Result.Failure<Guid>("An account with this email already exists.");
+            return Result.Conflict<Guid>("An account with this email already exists.");
 
         var user = new ApplicationUser
         {
@@ -37,7 +37,7 @@ public sealed class IdentityService(
     {
         var user = await userManager.FindByEmailAsync(email);
         if (user is null || !await userManager.CheckPasswordAsync(user, password))
-            return Result.Failure<UserCredentials>("Invalid email or password.");
+            return Result.Unauthorized<UserCredentials>("Invalid email or password.");
 
         var roles = await userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Buyer";

@@ -16,7 +16,7 @@ public sealed class RegisterBuyerCommandHandler(
     {
         var userResult = await identityService.CreateUserAsync(request.Email, request.Password, Role, ct);
         if (userResult.IsFailure)
-            return Result.Failure<AuthResultDto>(userResult.Error!);
+            return Result.Failure<AuthResultDto>(userResult);
 
         var buyerProfile = BuyerProfile.Register(userResult.Value, request.DisplayName, request.BuyerType, request.City);
 

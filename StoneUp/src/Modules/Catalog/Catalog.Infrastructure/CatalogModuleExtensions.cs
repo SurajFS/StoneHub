@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel.Infrastructure;
 
 namespace Catalog.Infrastructure;
 
@@ -13,10 +14,13 @@ public static class CatalogModuleExtensions
 {
     public static IServiceCollection AddCatalogModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<CatalogDbContext>(options =>
-            options.UseNpgsql(
-                configuration.GetConnectionString("StoneUp"),
-                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "catalog")));
+        services.AddDomainEventDispatch();
+        services.AddDbContext<CatalogDbContext>((sp, options) =>
+            options
+                .UseNpgsql(
+                    configuration.GetConnectionString("StoneUp"),
+                    npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "catalog"))
+                .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
 
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductQueryService, ProductQueryService>();

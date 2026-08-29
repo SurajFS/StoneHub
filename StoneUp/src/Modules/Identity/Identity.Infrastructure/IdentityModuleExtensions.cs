@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SharedKernel.Infrastructure;
 
 namespace Identity.Infrastructure;
 
@@ -17,10 +18,13 @@ public static class IdentityModuleExtensions
 {
     public static IServiceCollection AddIdentityModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<IdentityModuleDbContext>(options =>
-            options.UseNpgsql(
-                configuration.GetConnectionString("StoneUp"),
-                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "identity")));
+        services.AddDomainEventDispatch();
+        services.AddDbContext<IdentityModuleDbContext>((sp, options) =>
+            options
+                .UseNpgsql(
+                    configuration.GetConnectionString("StoneUp"),
+                    npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "identity"))
+                .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
 
         services
             .AddIdentityCore<ApplicationUser>(options =>

@@ -18,7 +18,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
             new RegisterSellerCommand(request.Email, request.Password, request.CompanyName, request.City, request.State),
             ct);
 
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        return result.ToActionResult();
     }
 
     [HttpPost("register/buyer")]
@@ -28,14 +28,14 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
             new RegisterBuyerCommand(request.Email, request.Password, request.DisplayName, request.BuyerType, request.City),
             ct);
 
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        return result.ToActionResult();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken ct)
     {
         var result = await mediator.Send(new LoginCommand(request.Email, request.Password), ct);
-        return result.IsSuccess ? Ok(result.Value) : Unauthorized(result.Error);
+        return result.ToActionResult();
     }
 }
 

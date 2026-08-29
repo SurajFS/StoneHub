@@ -61,7 +61,7 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(command, ct);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+            : result.ToActionResult();
     }
 
     [Authorize(Roles = "Seller")]
@@ -81,7 +81,7 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
             request.QuantityAvailable);
 
         var result = await mediator.Send(command, ct);
-        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : result.ToActionResult();
     }
 
     [Authorize(Roles = "Seller")]
@@ -89,7 +89,7 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateStock(Guid id, UpdateStockRequest request, CancellationToken ct)
     {
         var result = await mediator.Send(new UpdateStockCommand(id, CallerSellerId, request.QuantityAvailable), ct);
-        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+        return result.IsSuccess ? NoContent() : result.ToActionResult();
     }
 
     private Guid CallerSellerId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
