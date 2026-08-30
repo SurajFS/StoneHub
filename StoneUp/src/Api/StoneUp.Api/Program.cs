@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Catalog.Infrastructure;
 using Identity.Infrastructure;
+using Media.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -19,7 +20,8 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services
     .AddIdentityModule(builder.Configuration)
-    .AddCatalogModule(builder.Configuration);
+    .AddCatalogModule(builder.Configuration)
+    .AddMediaModule(builder.Configuration);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
@@ -34,6 +36,7 @@ if (app.Environment.IsDevelopment())
     using var migrationScope = app.Services.CreateScope();
     await migrationScope.ServiceProvider.GetRequiredService<IdentityModuleDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<CatalogDbContext>().Database.MigrateAsync();
+    await migrationScope.ServiceProvider.GetRequiredService<MediaDbContext>().Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();

@@ -15,8 +15,8 @@ access). This gives code-level separation without the operational cost of micros
 there's no proven scale or team size that justifies it.
 
 Migration path: because modules never share tables and only talk through published
-contracts/events, any module can later be lifted into its own service (Media and Messaging
-are the most likely candidates if load ever demands it) without rewriting the rest.
+contracts/events, any module can later be lifted into its own service (Media is the most
+likely candidate if load ever demands it) without rewriting the rest.
 
 ## Modules
 
@@ -26,7 +26,6 @@ are the most likely candidates if load ever demands it) without rewriting the re
 | Catalog | Products, listings, categories, stock availability, search |
 | Requirement | Buyer-posted requirements, seller quotations/offers |
 | Trust | Reviews, ratings, seller verification badge, fake-listing reports |
-| Messaging | Buyer↔seller chat, notifications (SignalR) |
 | Media | Photo/video upload orchestration (metadata only — files live in blob storage) |
 | Admin | Cross-module moderation views (users, products, reviews, reports, premium listings) |
 | Billing (stub) | Interfaces only for now — subscriptions/featured listings wired in later |
@@ -39,9 +38,9 @@ internals.
 
 - ASP.NET Core Web API (.NET, current scaffold on net10.0)
 - EF Core + PostgreSQL — one database, one schema per module, no cross-module joins in code
-- Redis — caching + SignalR backplane
-- SignalR — real-time chat and quote notifications
-- Hangfire — background jobs (search re-index, requirement-match digests, quote expiry)
+- Cloudflare R2 (S3-compatible) — media blob storage; direct-to-blob via presigned URLs
+- In-memory cache (`IMemoryCache`) — Redis descoped for v1; single-instance only
+- Hangfire — background jobs (search re-index, quote expiry); **Postgres-backed storage**
 - Serilog + OpenTelemetry — logging/tracing
 - API versioned from the first controller (`/api/v1/...`)
 
@@ -66,12 +65,12 @@ production.
 
 - TypeScript throughout
 - Feature-folder structure mirroring backend modules 1:1 (`auth`, `catalog`, `requirements`,
-  `trust`, `chat`, `seller-dashboard`)
+  `trust`, `seller-dashboard`)
 - Server state: TanStack Query (React Query)
 - Client state: Zustand
 - API client generated from the backend's OpenAPI spec
-- Media uploads go direct-to-blob-storage via presigned URLs from the API — never proxied
-  through the backend
+- Media uploads go direct-to-blob (Cloudflare R2) via presigned URLs from the API —
+  never proxied through the backend
 
 ## Future features — how they plug in
 
@@ -90,11 +89,25 @@ production.
 1. Identity + Catalog (seller lists, buyer browses/searches) — walking skeleton
 2. Requirement / Quotation module
 3. Trust (reviews, verification, reporting)
-4. Messaging / chat
+4. Buyer↔seller contact (phone reveal / inquiry — realtime chat descoped)
 5. Admin panel
 6. Billing (real), AI identification, transport calculator
 
+## Descoped for v1 (2026-08-29)
+
+Removed to cut scope and external dependencies. The module boundaries make these
+additive to re-introduce later, not a rewrite.
+
+- **Messaging module + SignalR chat** — replaced by **phone reveal** (login-gated,
+  recorded as a lead); no realtime.
+- **Redis** — cache falls back to `IMemoryCache`; Hangfire uses Postgres storage.
+- **SMS/OTP, email OTP, Google OAuth** — auth is **email + password only**.
+- **Push notifications** — notifications are in-app, pull-based.
+
 ## Open decisions
 
-- React Native: Expo vs. bare workflow — not yet decided
 - Hosting target (Azure vs AWS) — not yet decided
+
+_Resolved: React Native workflow → **Expo (managed / CNG)**; buyer↔seller contact →
+**phone reveal** (login-gated lead); password reset → **admin-assisted** (no email/OTP);
+media storage → **Cloudflare R2** (S3-compatible)._

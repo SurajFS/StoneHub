@@ -18,7 +18,13 @@
     <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Media/">
+    <Project Path="src/Modules/Media/Media.Application/Media.Application.csproj" />
+    <Project Path="src/Modules/Media/Media.Domain/Media.Domain.csproj" />
+    <Project Path="src/Modules/Media/Media.Infrastructure/Media.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Media.Tests/Media.Tests.csproj" />
     <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
   </Folder>
 </Solution>

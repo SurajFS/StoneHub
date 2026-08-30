@@ -8,4 +8,5 @@ public interface IIdentityService
 {
     Task<Result<Guid>> CreateUserAsync(string email, string password, string role, CancellationToken ct = default);
     Task<Result<UserCredentials>> ValidateCredentialsAsync(string email, string password, CancellationToken ct = default);
+    Task<Result<UserCredentials>> GetUserByIdAsync(Guid userId, CancellationToken ct = default);
 }

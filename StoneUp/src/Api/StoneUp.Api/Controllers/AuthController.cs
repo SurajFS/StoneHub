@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using Identity.Application.Auth;
 using Identity.Application.Buyers;
 using Identity.Application.Sellers;
 using Identity.Domain;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StoneUp.Api.Controllers;
@@ -44,6 +46,16 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new LoginCommand(request.Email, request.Password), ct);
         return result.ToActionResult();
     }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me(CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetMeQuery(CallerUserId), ct);
+        return result.ToActionResult();
+    }
+
+    private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
 
 public sealed record RegisterSellerRequest(

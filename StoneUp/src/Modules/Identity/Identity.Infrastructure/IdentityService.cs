@@ -44,4 +44,16 @@ public sealed class IdentityService(
 
         return Result.Success(new UserCredentials(user.Id, user.Email!, role));
     }
+
+    public async Task<Result<UserCredentials>> GetUserByIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Result.NotFound<UserCredentials>("User not found.");
+
+        var roles = await userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "Buyer";
+
+        return Result.Success(new UserCredentials(user.Id, user.Email!, role));
+    }
 }
