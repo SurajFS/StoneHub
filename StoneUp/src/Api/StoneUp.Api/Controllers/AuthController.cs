@@ -47,6 +47,20 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return result.ToActionResult();
     }
 
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(RefreshRequest request, CancellationToken ct)
+    {
+        var result = await mediator.Send(new RefreshTokenCommand(request.RefreshToken), ct);
+        return result.ToActionResult();
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(RefreshRequest request, CancellationToken ct)
+    {
+        var result = await mediator.Send(new LogoutCommand(request.RefreshToken), ct);
+        return result.ToActionResult();
+    }
+
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> Me(CancellationToken ct)
@@ -70,3 +84,5 @@ public sealed record RegisterSellerRequest(
 public sealed record RegisterBuyerRequest(string Email, string Password, string DisplayName, BuyerType BuyerType, string City);
 
 public sealed record LoginRequest(string Email, string Password);
+
+public sealed record RefreshRequest(string RefreshToken);

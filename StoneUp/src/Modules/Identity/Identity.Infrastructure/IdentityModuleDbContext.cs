@@ -11,6 +11,7 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
 {
     public DbSet<SellerProfile> SellerProfiles => Set<SellerProfile>();
     public DbSet<BuyerProfile> BuyerProfiles => Set<BuyerProfile>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -28,5 +29,6 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
 
         builder.ApplyConfiguration(new SellerProfileConfiguration());
         builder.ApplyConfiguration(new BuyerProfileConfiguration());
+        builder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 }

@@ -24,6 +24,7 @@
     <Project Path="src/Modules/Media/Media.Infrastructure/Media.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Identity.Tests/Identity.Tests.csproj" />
     <Project Path="tests/Media.Tests/Media.Tests.csproj" />
     <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
   </Folder>

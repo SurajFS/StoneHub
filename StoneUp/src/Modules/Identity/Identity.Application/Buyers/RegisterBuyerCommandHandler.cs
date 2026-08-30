@@ -8,7 +8,7 @@ namespace Identity.Application.Buyers;
 public sealed class RegisterBuyerCommandHandler(
     IIdentityService identityService,
     IBuyerProfileRepository buyerProfileRepository,
-    IJwtTokenService jwtTokenService) : IRequestHandler<RegisterBuyerCommand, Result<AuthResultDto>>
+    IAuthTokenIssuer tokenIssuer) : IRequestHandler<RegisterBuyerCommand, Result<AuthResultDto>>
 {
     private const string Role = "Buyer";
 
@@ -23,7 +23,7 @@ public sealed class RegisterBuyerCommandHandler(
         buyerProfileRepository.Add(buyerProfile);
         await buyerProfileRepository.SaveChangesAsync(ct);
 
-        var token = jwtTokenService.GenerateToken(userResult.Value, request.Email, Role);
-        return Result.Success(new AuthResultDto(userResult.Value, request.Email, Role, token));
+        var result = await tokenIssuer.IssueAsync(userResult.Value, request.Email, Role, ct);
+        return Result.Success(result);
     }
 }

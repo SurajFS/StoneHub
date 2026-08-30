@@ -8,7 +8,7 @@ namespace Identity.Application.Sellers;
 public sealed class RegisterSellerCommandHandler(
     IIdentityService identityService,
     ISellerProfileRepository sellerProfileRepository,
-    IJwtTokenService jwtTokenService) : IRequestHandler<RegisterSellerCommand, Result<AuthResultDto>>
+    IAuthTokenIssuer tokenIssuer) : IRequestHandler<RegisterSellerCommand, Result<AuthResultDto>>
 {
     private const string Role = "Seller";
 
@@ -25,7 +25,7 @@ public sealed class RegisterSellerCommandHandler(
         sellerProfileRepository.Add(sellerProfile);
         await sellerProfileRepository.SaveChangesAsync(ct);
 
-        var token = jwtTokenService.GenerateToken(userResult.Value, request.Email, Role);
-        return Result.Success(new AuthResultDto(userResult.Value, request.Email, Role, token));
+        var result = await tokenIssuer.IssueAsync(userResult.Value, request.Email, Role, ct);
+        return Result.Success(result);
     }
 }

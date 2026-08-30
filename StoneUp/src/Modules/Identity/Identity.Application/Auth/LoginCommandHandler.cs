@@ -6,7 +6,7 @@ namespace Identity.Application.Auth;
 
 public sealed class LoginCommandHandler(
     IIdentityService identityService,
-    IJwtTokenService jwtTokenService) : IRequestHandler<LoginCommand, Result<AuthResultDto>>
+    IAuthTokenIssuer tokenIssuer) : IRequestHandler<LoginCommand, Result<AuthResultDto>>
 {
     public async Task<Result<AuthResultDto>> Handle(LoginCommand request, CancellationToken ct)
     {
@@ -15,7 +15,7 @@ public sealed class LoginCommandHandler(
             return Result.Failure<AuthResultDto>(credentialsResult);
 
         var credentials = credentialsResult.Value;
-        var token = jwtTokenService.GenerateToken(credentials.UserId, credentials.Email, credentials.Role);
-        return Result.Success(new AuthResultDto(credentials.UserId, credentials.Email, credentials.Role, token));
+        var result = await tokenIssuer.IssueAsync(credentials.UserId, credentials.Email, credentials.Role, ct);
+        return Result.Success(result);
     }
 }

@@ -60,8 +60,11 @@ public static class IdentityModuleExtensions
 
         services.AddScoped<ISellerProfileRepository, SellerProfileRepository>();
         services.AddScoped<IBuyerProfileRepository, BuyerProfileRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IAuthTokenIssuer, AuthTokenIssuer>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IIdentityService).Assembly));
         services.AddValidatorsFromAssembly(typeof(IIdentityService).Assembly);
