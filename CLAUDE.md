@@ -1,4 +1,4 @@
-# StoneUp — Backend (StoneUp.Api)
+# StoneHub — Backend (StoneHub.Api)
 
 > .NET modular-monolith API for a marble & granite marketplace connecting
 > dealers / wholesalers / manufacturers (sellers) with buyers (retail, builders,
@@ -65,13 +65,13 @@ primitives (`Entity`, `AggregateRoot`, `ValueObject`, `Result`, `IDomainEvent`,
 ## Project structure
 
 ```
-StoneUp/
+StoneHub/
 ├── ARCHITECTURE.md
-├── docker-compose.yml                 # postgres:16 (stoneup)
-└── StoneUp/
-    ├── StoneUp.slnx
+├── docker-compose.yml                 # postgres:16 (stonehub)
+└── StoneHub/
+    ├── StoneHub.slnx
     └── src/
-        ├── Api/StoneUp.Api/           # controllers, Program.cs, appsettings
+        ├── Api/StoneHub.Api/           # controllers, Program.cs, appsettings
         ├── BuildingBlocks/SharedKernel/
         └── Modules/
             └── <Module>/
@@ -88,9 +88,9 @@ StoneUp/
 # Database (Postgres 16)
 docker-compose up -d
 
-# Build / run / test  (from StoneUp/)
+# Build / run / test  (from StoneHub/)
 dotnet build                                  # warnings are errors
-dotnet run   --project src/Api/StoneUp.Api
+dotnet run   --project src/Api/StoneHub.Api
 dotnet test
 
 # EF migrations (per module — never edit a shipped migration; add a new one)
@@ -111,7 +111,7 @@ dotnet ef database update       --project src/Modules/<Module>/<Module>.Infrastr
 
 ---
 
-## The contract with StoneUp.Mobile
+## The contract with StoneHub.Mobile
 
 The API **generates the OpenAPI spec**; the mobile app generates its typed client from
 it. **The spec is the contract, not shared code.** A DTO / route / status-code change is

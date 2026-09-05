@@ -1,4 +1,4 @@
-# StoneUp — Architecture
+# StoneHub — Architecture
 
 Marble & Granite marketplace connecting dealers/wholesalers/manufacturers (sellers) with
 buyers (retail, builders, architects, contractors, shop owners).
@@ -48,9 +48,9 @@ internals.
 
 Separate repos, one shared contract:
 
-- `StoneUp.Api` — the .NET backend (this repo)
-- `StoneUp.Mobile` — React Native app (buyers + sellers)
-- `StoneUp.Admin` — admin panel, likely a plain React/Next.js web app (built later)
+- `StoneHub.Api` — the .NET backend (this repo)
+- `StoneHub.Mobile` — React Native app (buyers + sellers)
+- `StoneHub.Admin` — admin panel, likely a plain React/Next.js web app (built later)
 
 Rationale: different release cadence (API ships continuously, mobile goes through app-store
 review), different toolchains, different versioning. See chat log / team discussion for

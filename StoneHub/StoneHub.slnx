@@ -1,0 +1,38 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/StoneHub.Api/StoneHub.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/SharedKernel.Infrastructure/SharedKernel.Infrastructure.csproj" />
+    <Project Path="src/BuildingBlocks/SharedKernel/SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Catalog/">
+    <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inquiries/">
+    <Project Path="src/Modules/Inquiries/Inquiries.Application/Inquiries.Application.csproj" />
+    <Project Path="src/Modules/Inquiries/Inquiries.Domain/Inquiries.Domain.csproj" />
+    <Project Path="src/Modules/Inquiries/Inquiries.Infrastructure/Inquiries.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Media/">
+    <Project Path="src/Modules/Media/Media.Application/Media.Application.csproj" />
+    <Project Path="src/Modules/Media/Media.Domain/Media.Domain.csproj" />
+    <Project Path="src/Modules/Media/Media.Infrastructure/Media.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Catalog.Tests/Catalog.Tests.csproj" />
+    <Project Path="tests/Identity.Tests/Identity.Tests.csproj" />
+    <Project Path="tests/Inquiries.Tests/Inquiries.Tests.csproj" />
+    <Project Path="tests/Media.Tests/Media.Tests.csproj" />
+    <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
+  </Folder>
+</Solution>

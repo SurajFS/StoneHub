@@ -1,0 +1,26 @@
+namespace Catalog.Application.Dtos;
+
+public sealed record ProductDto(
+    Guid Id,
+    Guid SellerId,
+    string OwnerType,
+    string Title,
+    Guid CategoryId,
+    Guid? SubcategoryId,
+    string? Size,
+    string? Thickness,
+    string? Finish,
+    string? Color,
+    string Unit,
+    IReadOnlyList<string> Tags,
+    decimal QuantityAvailable,
+    decimal Price,
+    string Currency,
+    decimal? WholesalePrice,
+    decimal? MinimumOrderQuantity,
+    string? SellerName,
+    string? SellerLocation,
+    bool IsAvailable,
+    bool IsActive,
+    IReadOnlyList<string> MediaUrls,
+    DateTimeOffset CreatedAt);
