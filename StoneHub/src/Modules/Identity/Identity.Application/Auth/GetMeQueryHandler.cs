@@ -8,9 +8,11 @@ namespace Identity.Application.Auth;
 public sealed class GetMeQueryHandler(
     IIdentityService identityService,
     ISellerProfileRepository sellerProfiles,
+    IWholesalerProfileRepository wholesalerProfiles,
     IBuyerProfileRepository buyerProfiles) : IRequestHandler<GetMeQuery, Result<MeDto>>
 {
     private const string SellerRole = "Seller";
+    private const string WholesalerRole = "Wholesaler";
 
     public async Task<Result<MeDto>> Handle(GetMeQuery request, CancellationToken ct)
     {
@@ -27,6 +29,12 @@ public sealed class GetMeQueryHandler(
             var seller = await sellerProfiles.GetByUserIdAsync(user.UserId, ct);
             name = seller?.CompanyName;
             city = seller?.Location.City;
+        }
+        else if (user.Role == WholesalerRole)
+        {
+            var wholesaler = await wholesalerProfiles.GetByUserIdAsync(user.UserId, ct);
+            name = wholesaler?.BusinessName;
+            city = wholesaler?.Location.City;
         }
         else
         {
