@@ -1,6 +1,6 @@
 # .NET / ASP.NET Core Stack Rules
 
-Apply when working in a .NET backend (C# 12+/.NET 8+; StoneUp targets **net10.0**).
+Apply when working in a .NET backend (C# 12+/.NET 8+; StoneHub targets **net10.0**).
 Assumes an **ASP.NET Core Web API** organized as a **modular monolith** with CQRS
 (MediatR), EF Core, and a DDD-flavoured domain layer.
 
@@ -273,7 +273,7 @@ Every write is a **Command**, every read is a **Query**, each with its own handl
 
 ## The mobile contract is the OpenAPI spec
 
-- The backend **generates the OpenAPI spec**; `StoneUp.Mobile` generates its typed API
+- The backend **generates the OpenAPI spec**; `StoneHub.Mobile` generates its typed API
   client from it. **The spec is the contract, not shared code.**
 - A change to a request/response DTO, a route, or a status code is a **contract change**.
   Treat it as one: it will break the client build if the client isn't regenerated. Call

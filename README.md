@@ -1,4 +1,4 @@
-# StoneUp
+# StoneHub
 
 Marketplace app connecting marble & granite dealers/wholesalers/manufacturers with buyers
 (retail, builders, architects, contractors, shop owners).
@@ -9,12 +9,12 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the system design and the reasoning b
 
 ## Planned repo layout
 
-This folder currently holds the backend solution (`StoneUp/`, containing `StoneUp.slnx`).
+This folder currently holds the backend solution (`StoneHub/`, containing `StoneHub.slnx`).
 As the project grows, the plan is three independent repos:
 
-- `StoneUp.Api` — .NET backend
-- `StoneUp.Mobile` — React Native app
-- `StoneUp.Admin` — admin web panel (built later)
+- `StoneHub.Api` — .NET backend
+- `StoneHub.Mobile` — React Native app
+- `StoneHub.Admin` — admin web panel (built later)
 
 ## Getting started
 
