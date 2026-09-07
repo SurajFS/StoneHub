@@ -12,6 +12,10 @@ namespace StoneHub.Api.Controllers;
 [Route("api/v1/products")]
 public sealed class ProductsController(IMediator mediator) : ControllerBase
 {
+    // Browse is role-scoped: the visible owner type is derived from the caller's role and forced
+    // onto the query. Buyers and wholesalers see seller listings; sellers see wholesaler listings.
+    // Any client-supplied owner type is ignored — it is an authorization decision, not a filter.
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<PagedResult<ProductDto>>> Search(
         [FromQuery] Guid? categoryId,
@@ -19,7 +23,6 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
         [FromQuery] string? keyword,
         [FromQuery] string? sellerName,
         [FromQuery] string? location,
-        [FromQuery] string? ownerType,
         [FromQuery] decimal? minPrice,
         [FromQuery] decimal? maxPrice,
         [FromQuery] bool inStockOnly = false,
@@ -30,17 +33,28 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
         CancellationToken ct = default)
     {
         var filter = new ProductSearchFilter(
-            categoryId, subcategoryId, keyword, sellerName, location, ownerType,
+            categoryId, subcategoryId, keyword, sellerName, location, VisibleOwnerType,
             minPrice, maxPrice, inStockOnly, maxMoq, sortBy, page, pageSize);
         var results = await mediator.Send(new SearchProductsQuery(filter), ct);
         return Ok(results);
     }
 
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ProductDto>> GetById(Guid id, CancellationToken ct)
     {
         var product = await mediator.Send(new GetProductByIdQuery(id), ct);
-        return product is null ? NotFound() : Ok(product);
+        if (product is null)
+            return NotFound();
+
+        // Owners always see their own listing; otherwise a caller may only open a listing whose
+        // owner type is visible to their role. Return 404 (not 403) so a hidden listing's
+        // existence isn't revealed.
+        var isOwner = product.SellerId == CallerSellerId;
+        if (!isOwner && !string.Equals(product.OwnerType, VisibleOwnerType, StringComparison.OrdinalIgnoreCase))
+            return NotFound();
+
+        return Ok(product);
     }
 
     [Authorize(Roles = "Seller,Wholesaler")]
@@ -127,6 +141,10 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
 
     // A listing's owner type follows the caller's role; wholesalers list wholesale supply.
     private string CallerOwnerType => User.IsInRole("Wholesaler") ? "Wholesaler" : "Seller";
+
+    // The single listing owner type a caller may browse/open, derived from their role:
+    // sellers source stock from wholesalers, while buyers and wholesalers browse seller listings.
+    private string VisibleOwnerType => User.IsInRole("Seller") ? "Wholesaler" : "Seller";
 }
 
 public sealed record CreateProductListingRequest(
