@@ -23,6 +23,11 @@
     <Project Path="src/Modules/Inquiries/Inquiries.Domain/Inquiries.Domain.csproj" />
     <Project Path="src/Modules/Inquiries/Inquiries.Infrastructure/Inquiries.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Messaging/">
+    <Project Path="src/Modules/Messaging/Messaging.Domain/Messaging.Domain.csproj" />
+    <Project Path="src/Modules/Messaging/Messaging.Application/Messaging.Application.csproj" />
+    <Project Path="src/Modules/Messaging/Messaging.Infrastructure/Messaging.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Media/">
     <Project Path="src/Modules/Media/Media.Application/Media.Application.csproj" />
     <Project Path="src/Modules/Media/Media.Domain/Media.Domain.csproj" />

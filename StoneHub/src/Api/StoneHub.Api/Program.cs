@@ -4,6 +4,7 @@ using Identity.Infrastructure;
 using Inquiries.Infrastructure;
 using Media.Infrastructure;
 using MediatR;
+using Messaging.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using StoneHub.Api;
@@ -23,7 +24,8 @@ builder.Services
     .AddIdentityModule(builder.Configuration)
     .AddCatalogModule(builder.Configuration)
     .AddMediaModule(builder.Configuration)
-    .AddInquiriesModule(builder.Configuration);
+    .AddInquiriesModule(builder.Configuration)
+    .AddMessagingModule(builder.Configuration);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
@@ -40,6 +42,7 @@ if (app.Environment.IsDevelopment())
     await migrationScope.ServiceProvider.GetRequiredService<CatalogDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<MediaDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<InquiryDbContext>().Database.MigrateAsync();
+    await migrationScope.ServiceProvider.GetRequiredService<MessagingDbContext>().Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
