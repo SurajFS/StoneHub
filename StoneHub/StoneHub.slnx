@@ -38,6 +38,7 @@
     <Project Path="tests/Identity.Tests/Identity.Tests.csproj" />
     <Project Path="tests/Inquiries.Tests/Inquiries.Tests.csproj" />
     <Project Path="tests/Media.Tests/Media.Tests.csproj" />
+    <Project Path="tests/Messaging.Tests/Messaging.Tests.csproj" />
     <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
   </Folder>
 </Solution>
