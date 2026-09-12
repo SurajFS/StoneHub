@@ -15,6 +15,7 @@ public sealed class BuyerProfileConfiguration : IEntityTypeConfiguration<BuyerPr
         builder.Property(x => x.DisplayName).IsRequired().HasMaxLength(200);
         builder.Property(x => x.BuyerType).IsRequired().HasConversion<string>().HasMaxLength(50);
         builder.Property(x => x.City).IsRequired().HasMaxLength(100);
+        builder.Property(x => x.AvatarUrl).HasMaxLength(500);
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.HasIndex(x => x.UserId).IsUnique();

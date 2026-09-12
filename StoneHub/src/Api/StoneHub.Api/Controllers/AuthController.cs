@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Identity.Application.Auth;
 using Identity.Application.Buyers;
+using Identity.Application.Profile;
 using Identity.Application.Sellers;
 using Identity.Application.Wholesalers;
 using Identity.Domain;
@@ -87,6 +88,24 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return result.ToActionResult();
     }
 
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateMe(UpdateProfileRequest request, CancellationToken ct)
+    {
+        var result = await mediator.Send(
+            new UpdateProfileCommand(
+                CallerUserId,
+                request.Name,
+                request.City,
+                request.State,
+                request.Phone,
+                request.WhatsAppNumber,
+                request.AvatarUrl),
+            ct);
+
+        return result.ToActionResult();
+    }
+
     private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
 
@@ -109,6 +128,14 @@ public sealed record RegisterWholesalerRequest(
     string? WhatsAppNumber);
 
 public sealed record RegisterBuyerRequest(string Email, string Password, string DisplayName, BuyerType BuyerType, string City);
+
+public sealed record UpdateProfileRequest(
+    string Name,
+    string City,
+    string? State,
+    string? Phone,
+    string? WhatsAppNumber,
+    string? AvatarUrl);
 
 public sealed record LoginRequest(string Email, string Password);
 

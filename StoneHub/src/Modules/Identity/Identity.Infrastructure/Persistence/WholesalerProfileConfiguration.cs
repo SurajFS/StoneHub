@@ -15,6 +15,7 @@ public sealed class WholesalerProfileConfiguration : IEntityTypeConfiguration<Wh
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Phone).IsRequired().HasMaxLength(20);
         builder.Property(x => x.WhatsAppNumber).HasMaxLength(20);
+        builder.Property(x => x.AvatarUrl).HasMaxLength(500);
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.OwnsOne(x => x.Location, location =>

@@ -15,6 +15,7 @@ public sealed class SellerProfileConfiguration : IEntityTypeConfiguration<Seller
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Phone).IsRequired().HasMaxLength(20);
         builder.Property(x => x.WhatsAppNumber).HasMaxLength(20);
+        builder.Property(x => x.AvatarUrl).HasMaxLength(500);
         builder.Property(x => x.IsVerified).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
