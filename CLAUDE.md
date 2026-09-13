@@ -33,8 +33,10 @@ Claude must read these before any task. They live in `.claude/rules/`.
 - **Hangfire** — background jobs (Postgres-backed storage)
 - JWT access + refresh tokens (Identity module) — **email + password auth only**
 
-> **v1 scope:** chat/Messaging, Redis, SMS/OTP, email OTP, Google OAuth, and push
-> notifications are **descoped** — see `../task.md` → "Descoped for v1".
+> **v1 scope:** Redis, SMS/OTP, email OTP, Google OAuth, and push notifications are
+> **descoped** — see `../task.md` → "Descoped for v1". **Note:** chat/Messaging was
+> originally descoped but has since been **reinstated** and shipped as HTTP poll-based
+> chat (no SignalR).
 
 ---
 
@@ -44,15 +46,17 @@ One deployable API, split into modules with **hard boundaries** (own domain mode
 schema; communicate via domain events / published interfaces — never direct cross-module
 table access).
 
-| Module | Responsibility |
-|---|---|
-| Identity | Users, sellers, buyers, auth (JWT + refresh), roles |
-| Catalog | Products, listings, categories, stock, search |
-| Requirement | Buyer requirements, seller quotations/offers |
-| Trust | Reviews, ratings, seller verification, fake-listing reports |
-| Media | Photo/video upload orchestration (metadata; files in blob storage) |
-| Admin | Cross-module moderation views |
-| Billing (stub) | Interfaces only — subscriptions/featured listings wired in later |
+| Module | Responsibility | Status |
+|---|---|---|
+| Identity | Users, sellers, buyers, wholesalers, auth (JWT + refresh), roles, profile edit | built |
+| Catalog | Products, listings, categories (DB taxonomy), stock, search (`pg_trgm`) | built |
+| Media | Photo/video upload orchestration (metadata; files in R2) | built |
+| Inquiries | Seller→wholesaler wholesale inquiries (status state machine) | built |
+| Messaging | In-app poll-based chat (Buyer↔Seller, Seller↔Wholesaler) — *reinstated* | built |
+| Requirement | Buyer requirements, seller quotations/offers | planned |
+| Trust | Reviews, ratings, seller verification, fake-listing reports | planned |
+| Admin | Cross-module moderation views | planned |
+| Billing (stub) | Interfaces only — subscriptions/featured listings wired in later | planned |
 
 Each module = **Domain** (entities, VOs, events, repo interfaces) + **Application**
 (CQRS handlers, validators, DTOs, service interfaces) + **Infrastructure** (EF Core

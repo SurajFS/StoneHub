@@ -1,5 +1,15 @@
 namespace Identity.Application.Dtos;
 
-// Current user + a bit of profile (company/display name + city) for the app's session
-// hydration and headers. Name/City are null if the profile isn't found.
-public sealed record MeDto(Guid UserId, string Email, string Role, string? Name, string? City);
+// Current user + their editable profile, for session hydration, headers, and the profile
+// screen/edit form. Profile fields are null if the profile isn't found; State/Phone/WhatsApp
+// are null for buyers (they don't carry those).
+public sealed record MeDto(
+    Guid UserId,
+    string Email,
+    string Role,
+    string? Name,
+    string? City,
+    string? State,
+    string? Phone,
+    string? WhatsAppNumber,
+    string? AvatarUrl);

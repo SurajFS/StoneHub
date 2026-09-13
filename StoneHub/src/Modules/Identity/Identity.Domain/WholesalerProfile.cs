@@ -9,6 +9,7 @@ public sealed class WholesalerProfile : AggregateRoot<Guid>
     public Location Location { get; private set; } = null!;
     public string Phone { get; private set; } = string.Empty;
     public string? WhatsAppNumber { get; private set; }
+    public string? AvatarUrl { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
     private WholesalerProfile() { }
@@ -48,12 +49,17 @@ public sealed class WholesalerProfile : AggregateRoot<Guid>
         return profile;
     }
 
-    public void UpdateProfile(string businessName, Location location)
+    public void UpdateProfile(string businessName, Location location, string phone, string? whatsAppNumber, string? avatarUrl)
     {
         if (string.IsNullOrWhiteSpace(businessName))
             throw new ArgumentException("Business name is required.", nameof(businessName));
+        if (string.IsNullOrWhiteSpace(phone))
+            throw new ArgumentException("Phone is required.", nameof(phone));
 
         BusinessName = businessName.Trim();
         Location = location;
+        Phone = phone.Trim();
+        WhatsAppNumber = string.IsNullOrWhiteSpace(whatsAppNumber) ? null : whatsAppNumber.Trim();
+        AvatarUrl = string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl.Trim();
     }
 }

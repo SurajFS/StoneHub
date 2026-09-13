@@ -20,19 +20,22 @@ likely candidate if load ever demands it) without rewriting the rest.
 
 ## Modules
 
-| Module | Responsibility |
-|---|---|
-| Identity | Users, sellers, buyers, auth (JWT + refresh), roles |
-| Catalog | Products, listings, categories, stock availability, search |
-| Requirement | Buyer-posted requirements, seller quotations/offers |
-| Trust | Reviews, ratings, seller verification badge, fake-listing reports |
-| Media | Photo/video upload orchestration (metadata only — files live in blob storage) |
-| Admin | Cross-module moderation views (users, products, reviews, reports, premium listings) |
-| Billing (stub) | Interfaces only for now — subscriptions/featured listings wired in later |
+| Module | Responsibility | Status |
+|---|---|---|
+| Identity | Users, sellers, buyers, wholesalers, auth (JWT + refresh), roles, profile edit | **built** |
+| Catalog | Products, listings, categories (DB taxonomy), stock, search (`pg_trgm`) | **built** |
+| Media | Photo/video upload orchestration (metadata only — files live in R2) | **built** |
+| Inquiries | Seller→wholesaler wholesale inquiries (status state machine) | **built** |
+| Messaging | In-app **poll-based** chat (Buyer↔Seller, Seller↔Wholesaler) | **built** — *reinstated, see Descoped note* |
+| Requirement | Buyer-posted requirements, seller quotations/offers | planned |
+| Trust | Reviews, ratings, seller verification badge, fake-listing reports | planned |
+| Admin | Cross-module moderation views (users, products, reviews, reports, premium listings) | planned |
+| Billing (stub) | Interfaces only for now — subscriptions/featured listings wired in later | planned |
 
 Each module = Domain + Application (CQRS via MediatR) + Infrastructure slice.
-Cross-module communication happens via domain events, not direct calls between modules'
-internals.
+Cross-module communication happens via domain events or a published application interface
+(e.g. Catalog's `IProductLookup`, Identity's `ISellerDirectory`), not direct calls between
+modules' internals.
 
 ## Tech stack (backend)
 
@@ -86,28 +89,36 @@ production.
 
 ## Suggested build order
 
-1. Identity + Catalog (seller lists, buyer browses/searches) — walking skeleton
-2. Requirement / Quotation module
-3. Trust (reviews, verification, reporting)
-4. Buyer↔seller contact (phone reveal / inquiry — realtime chat descoped)
-5. Admin panel
-6. Billing (real), AI identification, transport calculator
+1. Identity + Catalog (seller lists, buyer browses/searches) — walking skeleton ✅
+2. Requirement / Quotation module — *not started*
+3. Trust (reviews, verification, reporting) — *not started*
+4. Buyer↔seller contact — **shipped as in-app chat** (Messaging module), *not* phone reveal
+5. Admin panel — *not started*
+6. Billing (real), AI identification, transport calculator — *not started*
+
+> **Actually built ahead of this order:** Media (R2 uploads), a v2 marketplace expansion
+> (DB category taxonomy, Wholesaler role, `pg_trgm` search), wholesale **Inquiries**, in-app
+> **Messaging/chat**, and profile edit. See `../task.md` for the current, authoritative status.
 
 ## Descoped for v1 (2026-08-29)
 
 Removed to cut scope and external dependencies. The module boundaries make these
 additive to re-introduce later, not a rewrite.
 
-- **Messaging module + SignalR chat** — replaced by **phone reveal** (login-gated,
-  recorded as a lead); no realtime.
+- ~~**Messaging module + SignalR chat**~~ — **REINSTATED (later).** A `Messaging` module
+  was built and shipped, but as **HTTP poll-based chat** (client polls with a `?since=`
+  cursor — *still no SignalR/realtime*), not the phone-reveal replacement. Chat, not phone
+  reveal, is the buyer↔seller contact mechanism. Phone reveal was never built.
 - **Redis** — cache falls back to `IMemoryCache`; Hangfire uses Postgres storage.
 - **SMS/OTP, email OTP, Google OAuth** — auth is **email + password only**.
 - **Push notifications** — notifications are in-app, pull-based.
 
 ## Open decisions
 
-- Hosting target (Azure vs AWS) — not yet decided
+- _(none currently — hosting resolved below)_
 
 _Resolved: React Native workflow → **Expo (managed / CNG)**; buyer↔seller contact →
-**phone reveal** (login-gated lead); password reset → **admin-assisted** (no email/OTP);
-media storage → **Cloudflare R2** (S3-compatible)._
+**in-app chat** (Messaging module; supersedes the earlier phone-reveal decision, which was
+not built); password reset → **admin-assisted** (no email/OTP); media storage →
+**Cloudflare R2** (S3-compatible); hosting → **AWS EC2** (t3.small, Docker + Caddy behind
+HTTPS)._

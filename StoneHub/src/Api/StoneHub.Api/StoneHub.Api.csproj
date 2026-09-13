@@ -24,6 +24,8 @@
     <ProjectReference Include="..\..\Modules\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Inquiries\Inquiries.Infrastructure\Inquiries.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Inquiries\Inquiries.Application\Inquiries.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Messaging\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Messaging\Messaging.Application\Messaging.Application.csproj" />
   </ItemGroup>
 
 </Project>

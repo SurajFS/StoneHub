@@ -8,6 +8,7 @@ public sealed class BuyerProfile : AggregateRoot<Guid>
     public string DisplayName { get; private set; } = string.Empty;
     public BuyerType BuyerType { get; private set; }
     public string City { get; private set; } = string.Empty;
+    public string? AvatarUrl { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
     private BuyerProfile() { }
@@ -29,5 +30,17 @@ public sealed class BuyerProfile : AggregateRoot<Guid>
             throw new ArgumentException("City is required.", nameof(city));
 
         return new BuyerProfile(Guid.NewGuid(), userId, displayName.Trim(), buyerType, city.Trim());
+    }
+
+    public void UpdateProfile(string displayName, string city, string? avatarUrl)
+    {
+        if (string.IsNullOrWhiteSpace(displayName))
+            throw new ArgumentException("Display name is required.", nameof(displayName));
+        if (string.IsNullOrWhiteSpace(city))
+            throw new ArgumentException("City is required.", nameof(city));
+
+        DisplayName = displayName.Trim();
+        City = city.Trim();
+        AvatarUrl = string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl.Trim();
     }
 }

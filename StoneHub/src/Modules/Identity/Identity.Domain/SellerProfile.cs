@@ -9,6 +9,7 @@ public sealed class SellerProfile : AggregateRoot<Guid>
     public Location Location { get; private set; } = null!;
     public string Phone { get; private set; } = string.Empty;
     public string? WhatsAppNumber { get; private set; }
+    public string? AvatarUrl { get; private set; }
     public bool IsVerified { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -52,12 +53,17 @@ public sealed class SellerProfile : AggregateRoot<Guid>
 
     public void MarkVerified() => IsVerified = true;
 
-    public void UpdateProfile(string companyName, Location location)
+    public void UpdateProfile(string companyName, Location location, string phone, string? whatsAppNumber, string? avatarUrl)
     {
         if (string.IsNullOrWhiteSpace(companyName))
             throw new ArgumentException("Company name is required.", nameof(companyName));
+        if (string.IsNullOrWhiteSpace(phone))
+            throw new ArgumentException("Phone is required.", nameof(phone));
 
         CompanyName = companyName.Trim();
         Location = location;
+        Phone = phone.Trim();
+        WhatsAppNumber = string.IsNullOrWhiteSpace(whatsAppNumber) ? null : whatsAppNumber.Trim();
+        AvatarUrl = string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl.Trim();
     }
 }
