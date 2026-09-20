@@ -8,6 +8,7 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 {
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<SellerPromotionStatus> SellerPromotionStatuses => Set<SellerPromotionStatus>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -16,5 +17,6 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
         builder.HasDefaultSchema("catalog");
         builder.ApplyConfiguration(new ProductConfiguration());
         builder.ApplyConfiguration(new CategoryConfiguration());
+        builder.ApplyConfiguration(new SellerPromotionStatusConfiguration());
     }
 }
