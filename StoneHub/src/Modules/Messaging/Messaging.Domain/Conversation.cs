@@ -54,10 +54,15 @@ public sealed class Conversation : AggregateRoot<Guid>
 
     public bool HasParticipant(Guid userId) => ParticipantAId == userId || ParticipantBId == userId;
 
-    public void RecordMessage(string preview, DateTimeOffset sentAt)
+    public void RecordMessage(Guid senderId, string preview, DateTimeOffset sentAt)
     {
         LastMessagePreview = preview.Length > PreviewLength ? preview[..PreviewLength] : preview;
         LastMessageAt = sentAt;
+
+        var isSenderA = senderId == ParticipantAId;
+        var recipientId = isSenderA ? ParticipantBId : ParticipantAId;
+        var senderName = isSenderA ? ParticipantAName : ParticipantBName;
+        Raise(new NewMessageReceivedEvent(Id, recipientId, senderId, senderName, LastMessagePreview));
     }
 
     public void MarkRead(Guid userId, DateTimeOffset at)

@@ -75,7 +75,7 @@ public sealed class ConversationTests
         var convo = NewConversation();
         var at = DateTimeOffset.UtcNow;
 
-        convo.RecordMessage("hello", at);
+        convo.RecordMessage(convo.ParticipantAId, "hello", at);
 
         Assert.Equal("hello", convo.LastMessagePreview);
         Assert.Equal(at, convo.LastMessageAt);
@@ -86,9 +86,25 @@ public sealed class ConversationTests
     {
         var convo = NewConversation();
 
-        convo.RecordMessage(new string('x', 200), DateTimeOffset.UtcNow);
+        convo.RecordMessage(convo.ParticipantAId, new string('x', 200), DateTimeOffset.UtcNow);
 
         Assert.Equal(140, convo.LastMessagePreview!.Length);
+    }
+
+    [Fact]
+    public void RecordMessage_RaisesEventAddressedToTheOtherParticipant()
+    {
+        var convo = NewConversation();
+        convo.ClearDomainEvents();
+
+        convo.RecordMessage(convo.ParticipantAId, "hello", DateTimeOffset.UtcNow);
+
+        var raised = Assert.Single(convo.DomainEvents);
+        var received = Assert.IsType<NewMessageReceivedEvent>(raised);
+        Assert.Equal(convo.ParticipantBId, received.RecipientId);
+        Assert.Equal(convo.ParticipantAId, received.SenderId);
+        Assert.Equal(convo.ParticipantAName, received.SenderName);
+        Assert.Equal("hello", received.Preview);
     }
 
     [Fact]
