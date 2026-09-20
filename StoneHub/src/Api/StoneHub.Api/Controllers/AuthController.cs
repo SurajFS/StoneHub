@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Identity.Application.Admin;
 using Identity.Application.Auth;
 using Identity.Application.Buyers;
 using Identity.Application.Profile;
@@ -13,8 +14,24 @@ namespace StoneHub.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public sealed class AuthController(IMediator mediator) : ControllerBase
+public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
+    // Deliberately not self-service: admin accounts are created by whoever holds the bootstrap
+    // secret (an env var / user-secret, never committed — see appsettings.json), not through
+    // open registration like Buyer/Seller/Wholesaler.
+    [HttpPost("register/admin")]
+    public async Task<IActionResult> RegisterAdmin(
+        RegisterAdminRequest request, [FromHeader(Name = "X-Admin-Bootstrap-Secret")] string? bootstrapSecret, CancellationToken ct)
+    {
+        var expectedSecret = configuration["Admin:BootstrapSecret"];
+        if (string.IsNullOrEmpty(expectedSecret) || bootstrapSecret != expectedSecret)
+            return Forbid();
+
+        var result = await mediator.Send(
+            new RegisterAdminCommand(request.Email, request.Password, request.DisplayName), ct);
+        return result.ToActionResult();
+    }
+
     [HttpPost("register/seller")]
     public async Task<IActionResult> RegisterSeller(RegisterSellerRequest request, CancellationToken ct)
     {
@@ -108,6 +125,8 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
 
     private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
+
+public sealed record RegisterAdminRequest(string Email, string Password, string DisplayName);
 
 public sealed record RegisterSellerRequest(
     string Email,
