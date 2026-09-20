@@ -30,6 +30,8 @@
     <ProjectReference Include="..\..\Modules\Billing\Billing.Application\Billing.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Advertising\Advertising.Infrastructure\Advertising.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Advertising\Advertising.Application\Advertising.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Notifications\Notifications.Application\Notifications.Application.csproj" />
   </ItemGroup>
 
 </Project>

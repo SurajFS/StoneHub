@@ -43,6 +43,11 @@
     <Project Path="src/Modules/Advertising/Advertising.Application/Advertising.Application.csproj" />
     <Project Path="src/Modules/Advertising/Advertising.Infrastructure/Advertising.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
+    <Project Path="src/Modules/Notifications/Notifications.Application/Notifications.Application.csproj" />
+    <Project Path="src/Modules/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Advertising.Tests/Advertising.Tests.csproj" />
     <Project Path="tests/Billing.Tests/Billing.Tests.csproj" />
@@ -51,6 +56,7 @@
     <Project Path="tests/Inquiries.Tests/Inquiries.Tests.csproj" />
     <Project Path="tests/Media.Tests/Media.Tests.csproj" />
     <Project Path="tests/Messaging.Tests/Messaging.Tests.csproj" />
+    <Project Path="tests/Notifications.Tests/Notifications.Tests.csproj" />
     <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
   </Folder>
 </Solution>

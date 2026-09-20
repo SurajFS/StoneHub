@@ -8,6 +8,7 @@ using Media.Infrastructure;
 using MediatR;
 using Messaging.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Notifications.Infrastructure;
 using SharedKernel;
 using StoneHub.Api;
 
@@ -29,7 +30,8 @@ builder.Services
     .AddInquiriesModule(builder.Configuration)
     .AddMessagingModule(builder.Configuration)
     .AddBillingModule(builder.Configuration)
-    .AddAdvertisingModule(builder.Configuration);
+    .AddAdvertisingModule(builder.Configuration)
+    .AddNotificationsModule(builder.Configuration);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
@@ -49,6 +51,7 @@ if (app.Environment.IsDevelopment())
     await migrationScope.ServiceProvider.GetRequiredService<MessagingDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<BillingDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<AdvertisingDbContext>().Database.MigrateAsync();
+    await migrationScope.ServiceProvider.GetRequiredService<NotificationsDbContext>().Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
