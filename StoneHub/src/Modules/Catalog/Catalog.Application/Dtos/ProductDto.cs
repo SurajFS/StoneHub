@@ -22,5 +22,6 @@ public sealed record ProductDto(
     string? SellerLocation,
     bool IsAvailable,
     bool IsActive,
+    bool IsSponsored,
     IReadOnlyList<string> MediaUrls,
     DateTimeOffset CreatedAt);

@@ -24,7 +24,7 @@ public sealed class SendMessageCommandHandler(
         var message = result.Value;
         messages.Add(message);
         // List preview: the caption if any, otherwise a placeholder for the attachment.
-        conversation.RecordMessage(message.Body ?? "Photo", message.SentAt);
+        conversation.RecordMessage(request.SenderId, message.Body ?? "Photo", message.SentAt);
         // The new message and the conversation's last-message fields share one DbContext, so a
         // single SaveChanges commits both in the same transaction.
         await conversations.SaveChangesAsync(ct);

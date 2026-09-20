@@ -27,6 +27,9 @@ public sealed class Product : AggregateRoot<Guid>
     public string? SellerLocation { get; private set; }
     public bool IsAvailable { get; private set; }
     public bool IsActive { get; private set; }
+    // Set by Catalog's own event handlers reacting to Advertising's CampaignStarted/Stopped —
+    // never toggled directly by a caller (see Advertising module, cross-module event sync).
+    public bool IsSponsored { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public IReadOnlyList<ProductMedia> Media => _media.AsReadOnly();
 
@@ -168,6 +171,8 @@ public sealed class Product : AggregateRoot<Guid>
         SellerName = Normalize(sellerName);
         SellerLocation = Normalize(sellerLocation);
     }
+
+    public void SetSponsored(bool isSponsored) => IsSponsored = isSponsored;
 
     // Wholesale price and MOQ are all-or-nothing; when present, both must be sensible.
     private static Result ValidateWholesale(decimal? wholesalePrice, decimal? minimumOrderQuantity)

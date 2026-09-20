@@ -14,6 +14,18 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
     private const int DefaultPageSize = 20;
     private const int MaxPageSize = 100;
 
+    // Multiplicative, not additive: a barely-relevant Premium listing (low similarity) still
+    // can't outrank a clearly relevant Free one — it only nudges ties/near-ties toward Premium,
+    // same intent as "Multiple Premium Sellers" ranking by relevance instead of always Premium-first.
+    private const float PremiumRelevanceBoost = 1.25f;
+
+    // A sponsored (actively-advertised) product is boosted further still, on top of the
+    // Premium boost — same multiplicative, never-overrides-relevance reasoning.
+    private const float SponsoredRelevanceBoost = 1.5f;
+
+    // Trigram-similarity weight for a seller-name match relative to a title match (0..1 each).
+    private const float SellerNameRelevanceWeight = 0.3f;
+
     public async Task<ProductDto?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await dbContext.Products
             .AsNoTracking()
@@ -73,20 +85,51 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
 
         var total = await query.CountAsync(ct);
 
-        query = filter.SortBy switch
-        {
-            "price_asc" => query.OrderBy(p => p.Price.Amount),
-            "price_desc" => query.OrderByDescending(p => p.Price.Amount),
-            _ => query.OrderByDescending(p => p.CreatedAt)
-        };
+        var ordered = BuildOrdering(query, filter);
 
-        var items = await query
+        var items = await ordered
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(ProjectToDto())
             .ToListAsync(ct);
 
         return new PagedResult<ProductDto>(items, total, page, pageSize);
+    }
+
+    // An explicit price sort is a deliberate user choice — it wins outright, no promotional
+    // boost. Otherwise: a keyword search ranks by trigram relevance (Premium-boosted, never
+    // overridden — see PremiumRelevanceBoost); a plain browse/category feed puts Premium
+    // sellers' listings first ("Priority Product Listing"), newest-first beneath that.
+    private IQueryable<Product> BuildOrdering(IQueryable<Product> query, ProductSearchFilter filter)
+    {
+        if (filter.SortBy == "price_asc")
+            return query.OrderBy(p => p.Price.Amount);
+        if (filter.SortBy == "price_desc")
+            return query.OrderByDescending(p => p.Price.Amount);
+
+        if (!string.IsNullOrWhiteSpace(filter.Keyword))
+        {
+            var keyword = filter.Keyword.Trim();
+            return
+                from p in query
+                join promotion in dbContext.SellerPromotionStatuses on p.SellerId equals promotion.Id into promotionGroup
+                from promotion in promotionGroup.DefaultIfEmpty()
+                let titleSimilarity = EF.Functions.TrigramsSimilarity(p.Title, keyword)
+                let sellerSimilarity = p.SellerName != null ? EF.Functions.TrigramsSimilarity(p.SellerName, keyword) : 0f
+                let relevance = titleSimilarity + sellerSimilarity * SellerNameRelevanceWeight
+                let isPremium = promotion != null && promotion.IsPremium
+                let boost = (isPremium ? PremiumRelevanceBoost : 1f) * (p.IsSponsored ? SponsoredRelevanceBoost : 1f)
+                orderby relevance * boost descending, p.CreatedAt descending
+                select p;
+        }
+
+        return
+            from p in query
+            join promotion in dbContext.SellerPromotionStatuses on p.SellerId equals promotion.Id into promotionGroup
+            from promotion in promotionGroup.DefaultIfEmpty()
+            let isPremium = promotion != null && promotion.IsPremium
+            orderby p.IsSponsored descending, isPremium descending, p.CreatedAt descending
+            select p;
     }
 
     public async Task<IReadOnlyList<ProductDto>> GetBySellerAsync(Guid sellerId, CancellationToken ct = default) =>
@@ -119,6 +162,7 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
         p.SellerLocation,
         p.IsAvailable,
         p.IsActive,
+        p.IsSponsored,
         p.Media.Select(m => m.Url).ToList(),
         p.CreatedAt);
 }

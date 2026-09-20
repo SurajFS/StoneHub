@@ -29,6 +29,7 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.SellerLocation).HasMaxLength(220);
         builder.Property(x => x.IsAvailable).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
+        builder.Property(x => x.IsSponsored).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.OwnsOne(x => x.Price, price =>

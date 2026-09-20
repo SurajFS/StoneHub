@@ -127,6 +127,9 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsSponsored")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal?>("MinimumOrderQuantity")
                         .HasColumnType("numeric(18,2)");
 
@@ -190,6 +193,23 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasIndex("SubcategoryId");
 
                     b.ToTable("Products", "catalog");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.SellerPromotionStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsPremium")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SellerPromotionStatuses", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Product", b =>

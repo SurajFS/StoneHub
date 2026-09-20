@@ -27,6 +27,7 @@ public static class CatalogModuleExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICategoryQueryService, CategoryQueryService>();
         services.AddScoped<IProductLookup, ProductLookup>();
+        services.AddScoped<ISellerPromotionStatusRepository, SellerPromotionStatusRepository>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IProductQueryService).Assembly));
         services.AddValidatorsFromAssembly(typeof(IProductQueryService).Assembly);
