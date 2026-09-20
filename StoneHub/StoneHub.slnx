@@ -33,7 +33,13 @@
     <Project Path="src/Modules/Media/Media.Domain/Media.Domain.csproj" />
     <Project Path="src/Modules/Media/Media.Infrastructure/Media.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Billing/">
+    <Project Path="src/Modules/Billing/Billing.Domain/Billing.Domain.csproj" />
+    <Project Path="src/Modules/Billing/Billing.Application/Billing.Application.csproj" />
+    <Project Path="src/Modules/Billing/Billing.Infrastructure/Billing.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Billing.Tests/Billing.Tests.csproj" />
     <Project Path="tests/Catalog.Tests/Catalog.Tests.csproj" />
     <Project Path="tests/Identity.Tests/Identity.Tests.csproj" />
     <Project Path="tests/Inquiries.Tests/Inquiries.Tests.csproj" />
