@@ -24,4 +24,6 @@ public sealed record ProductDto(
     bool IsActive,
     bool IsSponsored,
     IReadOnlyList<string> MediaUrls,
+    IReadOnlyList<string> PhotoUrls,
+    IReadOnlyList<string> VideoUrls,
     DateTimeOffset CreatedAt);

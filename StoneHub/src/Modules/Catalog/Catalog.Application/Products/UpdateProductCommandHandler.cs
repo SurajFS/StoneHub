@@ -35,6 +35,14 @@ public sealed class UpdateProductCommandHandler(
             return updated;
 
         product.UpdateStock(request.QuantityAvailable);
+
+        if (request.PhotoUrls is not null || request.VideoUrls is not null)
+        {
+            var photos = (request.PhotoUrls ?? []).Select(url => ProductMedia.Create(url, MediaType.Photo));
+            var videos = (request.VideoUrls ?? []).Select(url => ProductMedia.Create(url, MediaType.Video));
+            product.ReplaceMedia(photos.Concat(videos));
+        }
+
         await productRepository.SaveChangesAsync(ct);
 
         return Result.Success();

@@ -31,6 +31,8 @@ public sealed class Product : AggregateRoot<Guid>
     // never toggled directly by a caller (see Advertising module, cross-module event sync).
     public bool IsSponsored { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
+    // Set once by Delete(); non-null rows are hidden from every Catalog read by a global query filter.
+    public DateTimeOffset? DeletedAt { get; private set; }
     public IReadOnlyList<ProductMedia> Media => _media.AsReadOnly();
 
     private Product() { }
@@ -164,6 +166,21 @@ public sealed class Product : AggregateRoot<Guid>
     public void Deactivate() => IsActive = false;
 
     public void AddMedia(ProductMedia media) => _media.Add(media);
+
+    // Edit replaces the whole media set (photos + video) rather than diffing it.
+    public void ReplaceMedia(IEnumerable<ProductMedia> media)
+    {
+        _media.Clear();
+        _media.AddRange(media);
+    }
+
+    // Soft delete: the row stays so conversations, inquiries and campaigns that reference the
+    // listing keep resolving (their lookups see it as missing). Idempotent.
+    public void Delete()
+    {
+        IsActive = false;
+        DeletedAt ??= DateTimeOffset.UtcNow;
+    }
 
     // Denormalized so search and product cards can show the owner without crossing into Identity.
     public void SetSellerInfo(string? sellerName, string? sellerLocation)

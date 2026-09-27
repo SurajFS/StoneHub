@@ -115,9 +115,20 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
             request.Currency,
             request.WholesalePrice,
             request.MinimumOrderQuantity,
-            request.QuantityAvailable);
+            request.QuantityAvailable,
+            request.PhotoUrls,
+            request.VideoUrls);
 
         var result = await mediator.Send(command, ct);
+        return result.IsSuccess ? NoContent() : result.ToActionResult();
+    }
+
+    // Soft delete — see Product.Delete. A deleted listing then 404s everywhere, including here.
+    [Authorize(Roles = "Seller,Wholesaler")]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteListing(Guid id, CancellationToken ct)
+    {
+        var result = await mediator.Send(new DeleteProductCommand(id, CallerSellerId), ct);
         return result.IsSuccess ? NoContent() : result.ToActionResult();
     }
 
@@ -179,7 +190,9 @@ public sealed record UpdateProductRequest(
     string Currency,
     decimal? WholesalePrice,
     decimal? MinimumOrderQuantity,
-    decimal QuantityAvailable);
+    decimal QuantityAvailable,
+    List<string>? PhotoUrls,
+    List<string>? VideoUrls);
 
 public sealed record UpdateStockRequest(decimal QuantityAvailable);
 

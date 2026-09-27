@@ -164,5 +164,7 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
         p.IsActive,
         p.IsSponsored,
         p.Media.Select(m => m.Url).ToList(),
+        p.Media.Where(m => m.MediaType == MediaType.Photo).Select(m => m.Url).ToList(),
+        p.Media.Where(m => m.MediaType == MediaType.Video).Select(m => m.Url).ToList(),
         p.CreatedAt);
 }

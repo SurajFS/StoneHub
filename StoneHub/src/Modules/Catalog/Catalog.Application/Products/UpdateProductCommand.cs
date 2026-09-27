@@ -19,4 +19,8 @@ public sealed record UpdateProductCommand(
     string Currency,
     decimal? WholesalePrice,
     decimal? MinimumOrderQuantity,
-    decimal QuantityAvailable) : IRequest<Result>;
+    decimal QuantityAvailable,
+    // Null for both = leave media untouched (older clients); otherwise the listing's media is
+    // replaced with exactly these, a null list meaning none of that kind.
+    List<string>? PhotoUrls,
+    List<string>? VideoUrls) : IRequest<Result>;

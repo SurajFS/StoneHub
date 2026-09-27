@@ -31,6 +31,7 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.IsSponsored).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.DeletedAt);
 
         builder.OwnsOne(x => x.Price, price =>
         {
@@ -55,6 +56,10 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(x => x.SubcategoryId);
         builder.HasIndex(x => x.OwnerType);
         builder.HasIndex(x => x.IsActive);
+
+        // Soft-deleted listings are invisible to every Catalog query, including IProductLookup, so
+        // other modules treat them exactly like a listing that no longer exists.
+        builder.HasQueryFilter(x => x.DeletedAt == null);
 
         builder.Ignore(x => x.DomainEvents);
     }

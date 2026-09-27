@@ -4,6 +4,9 @@ namespace Catalog.Application.Products;
 
 public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
+    // Matches the ProductMedia.Url column length.
+    private const int MaxMediaUrlLength = 2048;
+
     public UpdateProductCommandValidator()
     {
         RuleFor(x => x.Title).NotEmpty().MaximumLength(200);
@@ -17,5 +20,7 @@ public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProd
         RuleFor(x => x.QuantityAvailable).GreaterThanOrEqualTo(0);
         RuleFor(x => x.Price).GreaterThan(0);
         RuleFor(x => x.Currency).NotEmpty().Length(3);
+        RuleForEach(x => x.PhotoUrls).NotEmpty().MaximumLength(MaxMediaUrlLength);
+        RuleForEach(x => x.VideoUrls).NotEmpty().MaximumLength(MaxMediaUrlLength);
     }
 }
