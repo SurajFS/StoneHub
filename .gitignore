@@ -16,3 +16,7 @@ obj/
 ## OS cruft
 .DS_Store
 Thumbs.db
+
+## Deploy secrets / local settings
+deploy/deploy.env
+*.pem
