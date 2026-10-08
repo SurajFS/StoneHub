@@ -57,6 +57,9 @@ public sealed class ProductQueryService(CatalogDbContext dbContext) : IProductQu
                 p.Tags.Any(tag => EF.Functions.ILike(tag, pattern)));
         }
 
+        if (filter.SellerId is Guid sellerId)
+            query = query.Where(p => p.SellerId == sellerId);
+
         if (!string.IsNullOrWhiteSpace(filter.SellerName))
             query = query.Where(p =>
                 p.SellerName != null && EF.Functions.ILike(p.SellerName, $"%{filter.SellerName.Trim()}%"));

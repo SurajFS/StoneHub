@@ -28,13 +28,14 @@ public sealed class ProductsController(IMediator mediator) : ControllerBase
         [FromQuery] bool inStockOnly = false,
         [FromQuery] decimal? maxMoq = null,
         [FromQuery] string? sortBy = null,
+        [FromQuery] Guid? sellerId = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken ct = default)
     {
         var filter = new ProductSearchFilter(
             categoryId, subcategoryId, keyword, sellerName, location, VisibleOwnerType,
-            minPrice, maxPrice, inStockOnly, maxMoq, sortBy, page, pageSize);
+            minPrice, maxPrice, inStockOnly, maxMoq, sortBy, page, pageSize, sellerId);
         var results = await mediator.Send(new SearchProductsQuery(filter), ct);
         return Ok(results);
     }
