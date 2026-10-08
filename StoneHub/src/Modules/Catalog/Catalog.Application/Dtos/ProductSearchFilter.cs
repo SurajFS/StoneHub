@@ -13,4 +13,6 @@ public sealed record ProductSearchFilter(
     decimal? MaxMinimumOrderQuantity = null,
     string? SortBy = null,
     int Page = 1,
-    int PageSize = 20);
+    int PageSize = 20,
+    // Exact owner match for a seller's storefront. Trailing + optional so positional callers are unaffected.
+    Guid? SellerId = null);
