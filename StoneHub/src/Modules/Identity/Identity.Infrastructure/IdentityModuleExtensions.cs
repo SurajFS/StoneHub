@@ -68,6 +68,7 @@ public static class IdentityModuleExtensions
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<IAuthTokenIssuer, AuthTokenIssuer>();
         services.AddScoped<IProfileLocationResolver, ProfileLocationResolver>();
+        services.AddScoped<IProfileAddressIssueQueryService, ProfileAddressIssueQueryService>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 

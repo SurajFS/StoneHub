@@ -134,6 +134,13 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     public async Task<IActionResult> BackfillProfileAddresses(CancellationToken ct) =>
         (await mediator.Send(new BackfillProfileAddressesCommand(), ct)).ToActionResult();
 
+    // Data-quality report: profiles still on free text, and owners missing street / PIN.
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/profiles/address-issues")]
+    public async Task<IActionResult> GetProfileAddressIssues(
+        [FromQuery] string? role, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken ct = default) =>
+        (await mediator.Send(new GetProfileAddressIssuesQuery(role, page, pageSize), ct)).ToActionResult();
+
     private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
 
