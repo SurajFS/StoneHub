@@ -24,6 +24,9 @@ public sealed class WholesalerProfileConfiguration : IEntityTypeConfiguration<Wh
             location.Property(l => l.State).HasColumnName("State").IsRequired().HasMaxLength(100);
         });
 
+        builder.OwnsOne(x => x.Address, AddressMapping.MapColumns);
+        builder.Navigation(x => x.Address).IsRequired(false);
+
         builder.HasIndex(x => x.UserId).IsUnique();
 
         builder.Ignore(x => x.DomainEvents);

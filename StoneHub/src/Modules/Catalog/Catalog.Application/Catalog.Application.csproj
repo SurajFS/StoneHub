@@ -4,6 +4,8 @@
     <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
     <!-- Published contract only (ISellerDirectory) — never Identity.Infrastructure/Domain internals. -->
     <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
+    <!-- Published contract only: Identity's domain events (OwnerProfileChanged). -->
+    <ProjectReference Include="..\..\Identity\Identity.Domain\Identity.Domain.csproj" />
     <!-- Published contract only: Billing's domain events (Subscription Activated/Expired/Cancelled). -->
     <ProjectReference Include="..\..\Billing\Billing.Domain\Billing.Domain.csproj" />
     <!-- Published contract only: Advertising's domain events (CampaignStarted/Stopped). -->

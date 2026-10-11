@@ -23,10 +23,11 @@ public sealed class GetMeQueryHandler(
         var user = userResult.Value;
         string? name;
         string? city;
-        string? state = null;
+        string? state;
         string? phone = null;
         string? whatsApp = null;
         string? avatarUrl;
+        Address? address;
 
         if (user.Role == SellerRole)
         {
@@ -37,6 +38,7 @@ public sealed class GetMeQueryHandler(
             phone = seller?.Phone;
             whatsApp = seller?.WhatsAppNumber;
             avatarUrl = seller?.AvatarUrl;
+            address = seller?.Address;
         }
         else if (user.Role == WholesalerRole)
         {
@@ -47,16 +49,26 @@ public sealed class GetMeQueryHandler(
             phone = wholesaler?.Phone;
             whatsApp = wholesaler?.WhatsAppNumber;
             avatarUrl = wholesaler?.AvatarUrl;
+            address = wholesaler?.Address;
         }
         else
         {
             var buyer = await buyerProfiles.GetByUserIdAsync(user.UserId, ct);
             name = buyer?.DisplayName;
             city = buyer?.City;
+            state = buyer?.State;
             avatarUrl = buyer?.AvatarUrl;
+            address = buyer?.Address;
         }
 
-        return Result.Success(
-            new MeDto(user.UserId, user.Email, user.Role, name, city, state, phone, whatsApp, avatarUrl));
+        return Result.Success(new MeDto(
+            user.UserId, user.Email, user.Role, name, city, state, phone, whatsApp, avatarUrl, ToDto(address)));
     }
+
+    private static ProfileAddressDto? ToDto(Address? address) =>
+        address is null
+            ? null
+            : new ProfileAddressDto(
+                address.CountryCode, address.RegionCode, address.DistrictCode,
+                address.Line1, address.Line2, address.PostalCode, address.Locality);
 }

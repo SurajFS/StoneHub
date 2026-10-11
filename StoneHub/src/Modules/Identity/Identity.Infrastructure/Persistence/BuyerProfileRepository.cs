@@ -11,6 +11,9 @@ public sealed class BuyerProfileRepository(IdentityModuleDbContext dbContext) : 
     public Task<BuyerProfile?> GetByUserIdAsync(Guid userId, CancellationToken ct = default) =>
         dbContext.BuyerProfiles.FirstOrDefaultAsync(x => x.UserId == userId, ct);
 
+    public async Task<IReadOnlyList<BuyerProfile>> GetWithoutAddressAsync(CancellationToken ct = default) =>
+        await dbContext.BuyerProfiles.Where(x => x.Address == null).ToListAsync(ct);
+
     public void Add(BuyerProfile buyerProfile) => dbContext.BuyerProfiles.Add(buyerProfile);
 
     public Task SaveChangesAsync(CancellationToken ct = default) => dbContext.SaveChangesAsync(ct);

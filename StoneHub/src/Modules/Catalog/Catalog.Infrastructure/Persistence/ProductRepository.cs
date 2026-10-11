@@ -8,6 +8,9 @@ public sealed class ProductRepository(CatalogDbContext dbContext) : IProductRepo
     public Task<Product?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         dbContext.Products.FirstOrDefaultAsync(x => x.Id == id, ct);
 
+    public async Task<IReadOnlyList<Product>> GetBySellerIdAsync(Guid sellerId, CancellationToken ct = default) =>
+        await dbContext.Products.Where(x => x.SellerId == sellerId).ToListAsync(ct);
+
     public void Add(Product product) => dbContext.Products.Add(product);
 
     public Task SaveChangesAsync(CancellationToken ct = default) => dbContext.SaveChangesAsync(ct);

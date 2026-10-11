@@ -4,6 +4,7 @@ using Billing.Infrastructure;
 using Catalog.Infrastructure;
 using Identity.Infrastructure;
 using Inquiries.Infrastructure;
+using Locations.Infrastructure;
 using Media.Infrastructure;
 using MediatR;
 using Messaging.Infrastructure;
@@ -31,7 +32,8 @@ builder.Services
     .AddMessagingModule(builder.Configuration)
     .AddBillingModule(builder.Configuration)
     .AddAdvertisingModule(builder.Configuration)
-    .AddNotificationsModule(builder.Configuration);
+    .AddNotificationsModule(builder.Configuration)
+    .AddLocationsModule(builder.Configuration);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
@@ -52,6 +54,7 @@ if (app.Environment.IsDevelopment())
     await migrationScope.ServiceProvider.GetRequiredService<BillingDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<AdvertisingDbContext>().Database.MigrateAsync();
     await migrationScope.ServiceProvider.GetRequiredService<NotificationsDbContext>().Database.MigrateAsync();
+    await migrationScope.ServiceProvider.GetRequiredService<LocationsDbContext>().Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
