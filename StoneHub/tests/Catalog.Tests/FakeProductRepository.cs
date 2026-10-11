@@ -12,6 +12,9 @@ internal sealed class FakeProductRepository(params Product[] products) : IProduc
     public Task<Product?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         Task.FromResult(_products.GetValueOrDefault(id));
 
+    public Task<IReadOnlyList<Product>> GetBySellerIdAsync(Guid sellerId, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<Product>>(_products.Values.Where(p => p.SellerId == sellerId).ToList());
+
     public void Add(Product product) => _products[product.Id] = product;
 
     public Task SaveChangesAsync(CancellationToken ct = default)

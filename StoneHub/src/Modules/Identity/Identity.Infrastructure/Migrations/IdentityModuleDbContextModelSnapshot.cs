@@ -51,6 +51,10 @@ namespace Identity.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("State")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -369,8 +373,115 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("UserTokens", "identity");
                 });
 
+            modelBuilder.Entity("Identity.Domain.BuyerProfile", b =>
+                {
+                    b.OwnsOne("Identity.Domain.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("BuyerProfileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("CountryCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressCountryCode");
+
+                            b1.Property<string>("DistrictCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressDistrictCode");
+
+                            b1.Property<string>("Line1")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine1");
+
+                            b1.Property<string>("Line2")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine2");
+
+                            b1.Property<string>("Locality")
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)")
+                                .HasColumnName("AddressLocality");
+
+                            b1.Property<string>("PostalCode")
+                                .HasMaxLength(12)
+                                .HasColumnType("character varying(12)")
+                                .HasColumnName("AddressPostalCode");
+
+                            b1.Property<string>("RegionCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressRegionCode");
+
+                            b1.HasKey("BuyerProfileId");
+
+                            b1.ToTable("BuyerProfiles", "identity");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BuyerProfileId");
+                        });
+
+                    b.Navigation("Address");
+                });
+
             modelBuilder.Entity("Identity.Domain.SellerProfile", b =>
                 {
+                    b.OwnsOne("Identity.Domain.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("SellerProfileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("CountryCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressCountryCode");
+
+                            b1.Property<string>("DistrictCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressDistrictCode");
+
+                            b1.Property<string>("Line1")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine1");
+
+                            b1.Property<string>("Line2")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine2");
+
+                            b1.Property<string>("Locality")
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)")
+                                .HasColumnName("AddressLocality");
+
+                            b1.Property<string>("PostalCode")
+                                .HasMaxLength(12)
+                                .HasColumnType("character varying(12)")
+                                .HasColumnName("AddressPostalCode");
+
+                            b1.Property<string>("RegionCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressRegionCode");
+
+                            b1.HasKey("SellerProfileId");
+
+                            b1.ToTable("SellerProfiles", "identity");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SellerProfileId");
+                        });
+
                     b.OwnsOne("Identity.Domain.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("SellerProfileId")
@@ -396,12 +507,65 @@ namespace Identity.Infrastructure.Migrations
                                 .HasForeignKey("SellerProfileId");
                         });
 
+                    b.Navigation("Address");
+
                     b.Navigation("Location")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Identity.Domain.WholesalerProfile", b =>
                 {
+                    b.OwnsOne("Identity.Domain.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("WholesalerProfileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("CountryCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressCountryCode");
+
+                            b1.Property<string>("DistrictCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressDistrictCode");
+
+                            b1.Property<string>("Line1")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine1");
+
+                            b1.Property<string>("Line2")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("AddressLine2");
+
+                            b1.Property<string>("Locality")
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)")
+                                .HasColumnName("AddressLocality");
+
+                            b1.Property<string>("PostalCode")
+                                .HasMaxLength(12)
+                                .HasColumnType("character varying(12)")
+                                .HasColumnName("AddressPostalCode");
+
+                            b1.Property<string>("RegionCode")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("AddressRegionCode");
+
+                            b1.HasKey("WholesalerProfileId");
+
+                            b1.ToTable("WholesalerProfiles", "identity");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WholesalerProfileId");
+                        });
+
                     b.OwnsOne("Identity.Domain.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("WholesalerProfileId")
@@ -426,6 +590,8 @@ namespace Identity.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("WholesalerProfileId");
                         });
+
+                    b.Navigation("Address");
 
                     b.Navigation("Location")
                         .IsRequired();

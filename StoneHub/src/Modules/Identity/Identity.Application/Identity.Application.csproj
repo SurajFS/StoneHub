@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj" />
+    <!-- Published contract only: ILocationDirectory, for address resolution and the backfill. -->
+    <ProjectReference Include="..\..\Locations\Locations.Application\Locations.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

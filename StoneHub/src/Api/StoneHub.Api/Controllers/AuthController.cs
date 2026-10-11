@@ -40,6 +40,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
                 request.Email,
                 request.Password,
                 request.CompanyName,
+                request.Address,
                 request.City,
                 request.State,
                 request.Phone,
@@ -57,6 +58,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
                 request.Email,
                 request.Password,
                 request.BusinessName,
+                request.Address,
                 request.City,
                 request.State,
                 request.Phone,
@@ -70,7 +72,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     public async Task<IActionResult> RegisterBuyer(RegisterBuyerRequest request, CancellationToken ct)
     {
         var result = await mediator.Send(
-            new RegisterBuyerCommand(request.Email, request.Password, request.DisplayName, request.BuyerType, request.City),
+            new RegisterBuyerCommand(
+                request.Email, request.Password, request.DisplayName, request.BuyerType, request.Address, request.City),
             ct);
 
         return result.ToActionResult();
@@ -113,6 +116,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
             new UpdateProfileCommand(
                 CallerUserId,
                 request.Name,
+                request.Address,
                 request.City,
                 request.State,
                 request.Phone,
@@ -123,34 +127,52 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         return result.ToActionResult();
     }
 
+    // One-off after the structured-address deploy: attaches an Address to legacy profiles whose
+    // free-text city/state exactly matches a district. Safe to re-run; returns matched/unmatched.
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/profiles/address-backfill")]
+    public async Task<IActionResult> BackfillProfileAddresses(CancellationToken ct) =>
+        (await mediator.Send(new BackfillProfileAddressesCommand(), ct)).ToActionResult();
+
     private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
 
 public sealed record RegisterAdminRequest(string Email, string Password, string DisplayName);
 
+// Address is the structured location (current clients). City/State are the legacy free-text
+// fields that installed APKs still send. They're used only when Address is absent.
 public sealed record RegisterSellerRequest(
     string Email,
     string Password,
     string CompanyName,
-    string City,
-    string State,
     string Phone,
-    string? WhatsAppNumber);
+    string? WhatsAppNumber,
+    ProfileAddressInput? Address = null,
+    string? City = null,
+    string? State = null);
 
 public sealed record RegisterWholesalerRequest(
     string Email,
     string Password,
     string BusinessName,
-    string City,
-    string State,
     string Phone,
-    string? WhatsAppNumber);
+    string? WhatsAppNumber,
+    ProfileAddressInput? Address = null,
+    string? City = null,
+    string? State = null);
 
-public sealed record RegisterBuyerRequest(string Email, string Password, string DisplayName, BuyerType BuyerType, string City);
+public sealed record RegisterBuyerRequest(
+    string Email,
+    string Password,
+    string DisplayName,
+    BuyerType BuyerType,
+    ProfileAddressInput? Address = null,
+    string? City = null);
 
 public sealed record UpdateProfileRequest(
     string Name,
-    string City,
+    ProfileAddressInput? Address,
+    string? City,
     string? State,
     string? Phone,
     string? WhatsAppNumber,

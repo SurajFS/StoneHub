@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using Identity.Application;
+using Identity.Application.Profile;
 using Identity.Domain;
 using Identity.Infrastructure.Persistence;
 using MediatR;
@@ -66,6 +67,7 @@ public static class IdentityModuleExtensions
         services.AddScoped<ISellerDirectory, SellerDirectory>();
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<IAuthTokenIssuer, AuthTokenIssuer>();
+        services.AddScoped<IProfileLocationResolver, ProfileLocationResolver>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 

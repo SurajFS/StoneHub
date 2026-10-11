@@ -18,6 +18,7 @@ public static class LocationsModuleExtensions
                 npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", LocationsDbContext.Schema)));
 
         services.AddScoped<ILocationQueryService, LocationQueryService>();
+        services.AddScoped<ILocationDirectory, LocationDirectory>();
         services.AddScoped<PostalDirectoryImporter>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ILocationQueryService).Assembly));
