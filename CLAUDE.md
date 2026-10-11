@@ -53,6 +53,7 @@ table access).
 | Media | Photo/video upload orchestration (metadata; files in R2) | built |
 | Inquiries | Seller→wholesaler wholesale inquiries (status state machine) | built |
 | Messaging | In-app poll-based chat (Buyer↔Seller, Seller↔Wholesaler) — *reinstated* | built |
+| Locations | Address reference data: countries, ISO states, districts, India Post PIN → locality lookup | built (B1) |
 | Requirement | Buyer requirements, seller quotations/offers | planned |
 | Trust | Reviews, ratings, seller verification, fake-listing reports | planned |
 | Admin | Cross-module moderation views | planned |

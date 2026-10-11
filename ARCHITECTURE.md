@@ -27,6 +27,7 @@ likely candidate if load ever demands it) without rewriting the rest.
 | Media | Photo/video upload orchestration (metadata only — files live in R2) | **built** |
 | Inquiries | Seller→wholesaler wholesale inquiries (status state machine) | **built** |
 | Messaging | In-app **poll-based** chat (Buyer↔Seller, Seller↔Wholesaler) | **built** — *reinstated, see Descoped note* |
+| Locations | Address reference data (countries, ISO 3166-2 states, districts, PIN → locality) from the bundled India Post directory; Identity will validate profile addresses against it (B2) | **built** (B1, 2026-10-11) |
 | Requirement | Buyer-posted requirements, seller quotations/offers | planned |
 | Trust | Reviews, ratings, seller verification badge, fake-listing reports | planned |
 | Admin | Cross-module moderation views (users, products, reviews, reports, premium listings) | planned |
