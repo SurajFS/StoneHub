@@ -12,10 +12,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Modules\Billing\Billing.Domain\Billing.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Billing\Billing.Application\Billing.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Billing\Billing.Infrastructure\Billing.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

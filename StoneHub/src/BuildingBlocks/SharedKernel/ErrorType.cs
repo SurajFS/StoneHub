@@ -10,5 +10,6 @@ public enum ErrorType
     NotFound,     // resource does not exist (404)
     Conflict,     // violates a uniqueness / state invariant (409)
     Unauthorized, // caller is not authenticated / bad credentials (401)
-    Forbidden     // authenticated but not allowed (403)
+    Forbidden,    // authenticated but not allowed (403)
+    Unavailable   // a dependency the operation needs isn't configured / reachable right now (503)
 }

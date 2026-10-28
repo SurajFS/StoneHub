@@ -23,17 +23,48 @@ namespace Billing.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Billing.Domain.ProcessedPaymentEvent", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("EventId");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProcessedPaymentEvents", "billing");
+                });
+
             modelBuilder.Entity("Billing.Domain.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("CheckoutExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("GatewaySubscriptionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("PaymentNotes")
                         .HasMaxLength(500)
@@ -55,7 +86,13 @@ namespace Billing.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("WillRenew")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("GatewaySubscriptionId")
+                        .IsUnique();
 
                     b.HasIndex("UserId")
                         .IsUnique();
