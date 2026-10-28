@@ -8,4 +8,6 @@ public sealed record SubscriptionDto(
     DateTimeOffset StartDate,
     DateTimeOffset? ExpiryDate,
     string? PaymentNotes,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    // True while the gateway will charge again at ExpiryDate; false = Premium ends then.
+    bool WillRenew);

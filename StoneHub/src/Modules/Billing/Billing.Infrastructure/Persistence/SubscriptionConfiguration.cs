@@ -6,6 +6,9 @@ namespace Billing.Infrastructure.Persistence;
 
 public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
 {
+    private const int GatewayIdMaxLength = 100;
+    private const int CheckoutUrlMaxLength = 500;
+
     public void Configure(EntityTypeBuilder<Subscription> builder)
     {
         builder.ToTable("Subscriptions");
@@ -17,9 +20,15 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subscri
         builder.Property(x => x.StartDate).IsRequired();
         builder.Property(x => x.PaymentNotes).HasMaxLength(500);
         builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.GatewaySubscriptionId).HasMaxLength(GatewayIdMaxLength);
+        builder.Property(x => x.WillRenew).IsRequired();
+        builder.Property(x => x.CheckoutUrl).HasMaxLength(CheckoutUrlMaxLength);
 
         // One subscription per user.
         builder.HasIndex(x => x.UserId).IsUnique();
+
+        // Webhooks find the subscription by the gateway's id.
+        builder.HasIndex(x => x.GatewaySubscriptionId).IsUnique();
 
         builder.Ignore(x => x.DomainEvents);
     }
