@@ -17,6 +17,18 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void Unavailable_SetsUnavailableClassification_AndSurvivesForwarding()
+    {
+        var result = Result.Unavailable("Online payments aren't available right now.");
+
+        var forwarded = Result.Failure<string>(result);
+
+        Assert.Equal(ErrorType.Unavailable, result.ErrorType);
+        Assert.Equal(ErrorType.Unavailable, forwarded.ErrorType);
+        Assert.Equal(result.Error, forwarded.Error);
+    }
+
+    [Fact]
     public void Conflict_SetsConflictClassification()
     {
         var result = Result.Conflict("An account with this email already exists.");

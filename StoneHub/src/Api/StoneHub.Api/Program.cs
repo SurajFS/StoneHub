@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Notifications.Infrastructure;
 using SharedKernel;
 using StoneHub.Api;
+using StoneHub.Api.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,9 +37,12 @@ builder.Services
     .AddLocationsModule(builder.Configuration);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddApiRateLimiting(builder.Configuration);
 
 var app = builder.Build();
 
+// First, so everything after (rate-limit partitions, HTTPS redirect, logs) sees the real client.
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -61,6 +65,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

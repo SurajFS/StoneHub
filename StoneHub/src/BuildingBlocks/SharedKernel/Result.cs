@@ -31,6 +31,7 @@ public class Result
     public static Result Conflict(string error) => new(false, error, ErrorType.Conflict, null);
     public static Result Unauthorized(string error) => new(false, error, ErrorType.Unauthorized, null);
     public static Result Forbidden(string error) => new(false, error, ErrorType.Forbidden, null);
+    public static Result Unavailable(string error) => new(false, error, ErrorType.Unavailable, null);
 
     public static Result ValidationFailure(IReadOnlyDictionary<string, string[]> errors) =>
         new(false, "One or more validation errors occurred.", ErrorType.Validation, errors);
@@ -40,6 +41,7 @@ public class Result
     public static Result<T> Conflict<T>(string error) => new(default, false, error, ErrorType.Conflict, null);
     public static Result<T> Unauthorized<T>(string error) => new(default, false, error, ErrorType.Unauthorized, null);
     public static Result<T> Forbidden<T>(string error) => new(default, false, error, ErrorType.Forbidden, null);
+    public static Result<T> Unavailable<T>(string error) => new(default, false, error, ErrorType.Unavailable, null);
 
     public static Result<T> ValidationFailure<T>(IReadOnlyDictionary<string, string[]> errors) =>
         new(default, false, "One or more validation errors occurred.", ErrorType.Validation, errors);

@@ -17,7 +17,7 @@ public sealed class StartPremiumCheckoutCommandHandler(IPaymentGateway gateway, 
         if (subscription is null)
             return Result.NotFound<CheckoutDto>("No subscription found for this account.");
         if (!gateway.IsAvailable)
-            return Result.Failure<CheckoutDto>("Online payments aren't available right now.");
+            return Result.Unavailable<CheckoutDto>("Online payments aren't available right now.");
         if (subscription.IsPremiumActive)
             return Result.Conflict<CheckoutDto>("This account is already on Premium.");
 

@@ -1,9 +1,12 @@
+using System.Net.Mime;
 using System.Security.Claims;
 using Billing.Application.Payments;
 using Billing.Application.Subscriptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using StoneHub.Api.RateLimiting;
 
 namespace StoneHub.Api.Controllers;
 
@@ -44,6 +47,10 @@ public sealed class BillingController(IMediator mediator, ILogger<BillingControl
     // Razorpay → us. Authenticated by the HMAC signature over the raw body, not a JWT. Any 2xx
     // acknowledges; anything else makes Razorpay retry.
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.PaymentWebhook)]
+    // Razorpay always posts JSON. Any other type (e.g. a form) would be consumed by MVC's form
+    // binding before the raw body is read, so it's refused with 415 instead of failing oddly.
+    [Consumes(MediaTypeNames.Application.Json)]
     [HttpPost("webhooks/razorpay")]
     public async Task<IActionResult> RazorpayWebhook(
         [FromHeader(Name = "X-Razorpay-Signature")] string? signature,
