@@ -7,5 +7,12 @@ public enum PaymentWebhookOutcome
     Applied,
     Duplicate,
     Ignored,
-    UnknownSubscription
+    UnknownSubscription,
+
+    // A charge for a gateway plan we don't sell (misconfigured plan ids). Needs a human: money
+    // was taken but no plan was granted.
+    UnknownPlan,
+
+    // An older or replaced subscription's charge that changes nothing.
+    Stale
 }

@@ -25,21 +25,21 @@ public sealed class CancellationHandlerTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal([GatewayId], _gateway.CancelledImmediately);
-        Assert.False(subscription.IsPremiumActive);
+        Assert.False(subscription.IsPaidActive);
     }
 
     [Fact]
     public async Task AdminCancel_WhenAdminActivated_DoesNotCallGateway()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ActivatePremium(DateTimeOffset.UtcNow.AddDays(30), "offline");
+        subscription.ActivatePlan(SubscriptionPlan.Premium, DateTimeOffset.UtcNow.AddDays(30), "offline");
         _store.Add(subscription);
 
         await new CancelSubscriptionCommandHandler(_gateway, _store)
             .Handle(new CancelSubscriptionCommand(subscription.UserId), CancellationToken.None);
 
         Assert.Empty(_gateway.CancelledImmediately);
-        Assert.False(subscription.IsPremiumActive);
+        Assert.False(subscription.IsPaidActive);
     }
 
     [Fact]
@@ -47,13 +47,13 @@ public sealed class CancellationHandlerTests
     {
         var subscription = RenewingSubscription();
 
-        var result = await new CancelPremiumRenewalCommandHandler(_gateway, _store)
-            .Handle(new CancelPremiumRenewalCommand(subscription.UserId), CancellationToken.None);
+        var result = await new CancelRenewalCommandHandler(_gateway, _store)
+            .Handle(new CancelRenewalCommand(subscription.UserId), CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.Equal([GatewayId], _gateway.CancelledRenewals);
         Assert.False(subscription.WillRenew);
-        Assert.True(subscription.IsPremiumActive);
+        Assert.True(subscription.IsPaidActive);
     }
 
     [Fact]
@@ -62,8 +62,8 @@ public sealed class CancellationHandlerTests
         var subscription = Subscription.CreateFree(Guid.NewGuid());
         _store.Add(subscription);
 
-        var result = await new CancelPremiumRenewalCommandHandler(_gateway, _store)
-            .Handle(new CancelPremiumRenewalCommand(subscription.UserId), CancellationToken.None);
+        var result = await new CancelRenewalCommandHandler(_gateway, _store)
+            .Handle(new CancelRenewalCommand(subscription.UserId), CancellationToken.None);
 
         Assert.Equal(ErrorType.Conflict, result.ErrorType);
         Assert.Empty(_gateway.CancelledRenewals);
@@ -72,8 +72,8 @@ public sealed class CancellationHandlerTests
     [Fact]
     public async Task OwnerCancelRenewal_UnknownUser_ReturnsNotFound()
     {
-        var result = await new CancelPremiumRenewalCommandHandler(_gateway, _store)
-            .Handle(new CancelPremiumRenewalCommand(Guid.NewGuid()), CancellationToken.None);
+        var result = await new CancelRenewalCommandHandler(_gateway, _store)
+            .Handle(new CancelRenewalCommand(Guid.NewGuid()), CancellationToken.None);
 
         Assert.Equal(ErrorType.NotFound, result.ErrorType);
     }
@@ -81,7 +81,7 @@ public sealed class CancellationHandlerTests
     private Subscription RenewingSubscription()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ApplyGatewayCharge(GatewayId, DateTimeOffset.UtcNow.AddDays(30));
+        subscription.ApplyGatewayCharge(GatewayId, SubscriptionPlan.Basic, DateTimeOffset.UtcNow.AddDays(30));
         _store.Add(subscription);
         return subscription;
     }

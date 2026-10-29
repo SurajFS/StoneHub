@@ -4,8 +4,8 @@ using SharedKernel;
 
 namespace Billing.Application.Payments;
 
-// Applies a verified gateway event to the subscription it belongs to, once. Only charges grant
-// Premium; ended renewals just stop renewal, and the expiry sweep downgrades after the grace
+// Applies a verified gateway event to the subscription it belongs to, once. Only charges grant a
+// plan; ended renewals just stop renewal, and the expiry sweep downgrades after the grace
 // period, so a late or out-of-order event can't strip a paid period.
 public sealed class HandlePaymentWebhookCommandHandler(
     IPaymentGateway gateway,
@@ -42,23 +42,31 @@ public sealed class HandlePaymentWebhookCommandHandler(
 
         if (paymentEvent.Kind == PaymentEventKind.RenewalEnded)
         {
-            // Only the subscription currently linked to this gateway id; an older one ending
-            // must not stop a newer one's renewal.
-            linked?.StopRenewal();
-            return linked is null ? PaymentWebhookOutcome.UnknownSubscription : PaymentWebhookOutcome.Applied;
+            if (linked is null)
+                return PaymentWebhookOutcome.UnknownSubscription;
+            // Only the subscription currently paying: an unpaid checkout or an older subscription
+            // ending must not stop the current one's renewal.
+            if (linked.GatewaySubscriptionId != gatewayId)
+                return PaymentWebhookOutcome.Ignored;
+
+            linked.StopRenewal();
+            return PaymentWebhookOutcome.Applied;
         }
 
-        // A charge is money taken, so it always grants Premium: fall back to the user from the
-        // checkout notes when the stored gateway id was replaced (e.g. two checkouts started).
         // An activation without a period (a future-dated start) has nothing to grant yet.
         if (paymentEvent.PeriodEnd is not { } periodEnd)
             return PaymentWebhookOutcome.Ignored;
+        if (paymentEvent.GatewayPlanId is null || gateway.PlanFor(paymentEvent.GatewayPlanId) is not { } plan)
+            return PaymentWebhookOutcome.UnknownPlan;
 
+        // A charge is money taken, so it always reaches the owner: fall back to the user from the
+        // checkout notes when the gateway id isn't linked any more.
         var subscription = linked ?? (paymentEvent.UserId is { } userId ? await subscriptions.GetByUserIdAsync(userId, ct) : null);
         if (subscription is null)
             return PaymentWebhookOutcome.UnknownSubscription;
 
-        subscription.ApplyGatewayCharge(gatewayId, periodEnd);
-        return PaymentWebhookOutcome.Applied;
+        return subscription.ApplyGatewayCharge(gatewayId, plan, periodEnd)
+            ? PaymentWebhookOutcome.Applied
+            : PaymentWebhookOutcome.Stale;
     }
 }

@@ -9,11 +9,12 @@ public sealed class SubscriptionRepository(BillingDbContext dbContext) : ISubscr
         dbContext.Subscriptions.FirstOrDefaultAsync(x => x.UserId == userId, ct);
 
     public Task<Subscription?> GetByGatewaySubscriptionIdAsync(string gatewaySubscriptionId, CancellationToken ct = default) =>
-        dbContext.Subscriptions.FirstOrDefaultAsync(x => x.GatewaySubscriptionId == gatewaySubscriptionId, ct);
+        dbContext.Subscriptions.FirstOrDefaultAsync(
+            x => x.GatewaySubscriptionId == gatewaySubscriptionId || x.CheckoutGatewaySubscriptionId == gatewaySubscriptionId, ct);
 
     public async Task<IReadOnlyList<Subscription>> GetDueForExpiryAsync(DateTimeOffset now, CancellationToken ct = default) =>
         await dbContext.Subscriptions
-            .Where(x => x.Plan == SubscriptionPlan.Premium && x.Status == SubscriptionStatus.Active && x.ExpiryDate != null && x.ExpiryDate <= now)
+            .Where(x => x.Plan != SubscriptionPlan.Free && x.Status == SubscriptionStatus.Active && x.ExpiryDate != null && x.ExpiryDate <= now)
             .ToListAsync(ct);
 
     public void Add(Subscription subscription) => dbContext.Subscriptions.Add(subscription);
