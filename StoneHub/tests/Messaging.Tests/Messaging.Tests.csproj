@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Modules\Messaging\Messaging.Domain\Messaging.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Messaging\Messaging.Application\Messaging.Application.csproj" />
   </ItemGroup>
 
 </Project>

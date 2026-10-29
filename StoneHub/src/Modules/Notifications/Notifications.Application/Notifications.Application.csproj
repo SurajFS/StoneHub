@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Billing\Billing.Application\Billing.Application.csproj" />
     <ProjectReference Include="..\Notifications.Domain\Notifications.Domain.csproj" />
     <!-- Published contract only: Messaging's NewMessageReceivedEvent. -->
     <ProjectReference Include="..\..\Messaging\Messaging.Domain\Messaging.Domain.csproj" />

@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Modules\Inquiries\Inquiries.Domain\Inquiries.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Inquiries\Inquiries.Application\Inquiries.Application.csproj" />
   </ItemGroup>
 
 </Project>

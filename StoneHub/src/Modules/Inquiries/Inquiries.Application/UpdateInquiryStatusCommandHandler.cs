@@ -1,10 +1,11 @@
+using Billing.Application;
 using Inquiries.Domain;
 using MediatR;
 using SharedKernel;
 
 namespace Inquiries.Application;
 
-public sealed class UpdateInquiryStatusCommandHandler(IInquiryRepository inquiryRepository)
+public sealed class UpdateInquiryStatusCommandHandler(IInquiryRepository inquiryRepository, IPlanEntitlements entitlements)
     : IRequestHandler<UpdateInquiryStatusCommand, Result>
 {
     public async Task<Result> Handle(UpdateInquiryStatusCommand request, CancellationToken ct)
@@ -14,6 +15,8 @@ public sealed class UpdateInquiryStatusCommandHandler(IInquiryRepository inquiry
             return Result.NotFound("Inquiry not found.");
         if (inquiry.WholesalerId != request.CallerWholesalerId)
             return Result.Forbidden("You do not have permission to update this inquiry.");
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.CallerWholesalerId, ct))
+            return Result.PaymentRequired(InquiryPlanMessages.InquiriesNeedPlan);
 
         var result = request.Status.Trim().ToLowerInvariant() switch
         {

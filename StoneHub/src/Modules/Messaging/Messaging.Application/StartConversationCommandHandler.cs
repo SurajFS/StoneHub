@@ -1,3 +1,4 @@
+using Billing.Application;
 using Catalog.Application;
 using Identity.Application;
 using MediatR;
@@ -9,10 +10,16 @@ namespace Messaging.Application;
 public sealed class StartConversationCommandHandler(
     IConversationRepository conversations,
     IProductLookup productLookup,
-    IUserDirectory userDirectory) : IRequestHandler<StartConversationCommand, Result<Guid>>
+    IUserDirectory userDirectory,
+    IPlanEntitlements entitlements) : IRequestHandler<StartConversationCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(StartConversationCommand request, CancellationToken ct)
     {
+        // A Free seller/wholesaler can't start chats. Anyone may message one; they subscribe to
+        // read and reply (see SendMessage / GetMessages).
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.CallerId, ct))
+            return Result.PaymentRequired<Guid>(PlanMessages.ChatNeedsPlan);
+
         var product = await productLookup.GetOwnerInfoAsync(request.ProductId, ct);
         if (product is null || !product.IsActive)
             return Result.NotFound<Guid>("Product not found.");

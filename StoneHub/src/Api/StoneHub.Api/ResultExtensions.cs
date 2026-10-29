@@ -44,6 +44,7 @@ public static class ResultExtensions
         ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
         ErrorType.Forbidden => StatusCodes.Status403Forbidden,
         ErrorType.Unavailable => StatusCodes.Status503ServiceUnavailable,
+        ErrorType.PaymentRequired => StatusCodes.Status402PaymentRequired,
         _ => StatusCodes.Status400BadRequest
     };
 
@@ -54,6 +55,7 @@ public static class ResultExtensions
         ErrorType.Unauthorized => "Unauthorized.",
         ErrorType.Forbidden => "Forbidden.",
         ErrorType.Unavailable => "Service unavailable.",
+        ErrorType.PaymentRequired => "Subscription required.",
         _ => "Bad request."
     };
 }

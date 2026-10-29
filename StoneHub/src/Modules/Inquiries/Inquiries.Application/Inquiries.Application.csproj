@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Billing\Billing.Application\Billing.Application.csproj" />
     <ProjectReference Include="..\Inquiries.Domain\Inquiries.Domain.csproj" />
     <!-- Published contracts only: Catalog's IProductLookup + Identity's ISellerDirectory. -->
     <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
