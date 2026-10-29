@@ -12,6 +12,7 @@ public sealed class RazorpayWebhookTests
 {
     private const string Secret = "whsec_test";
     private const string GatewayId = "sub_ABC123";
+    private const string GatewayPlanId = "plan_BASIC1";
     private const long CurrentEnd = 1_798_761_600; // 2027-01-01T00:00:00Z
 
     [Fact]
@@ -73,7 +74,7 @@ public sealed class RazorpayWebhookTests
     }
 
     [Fact]
-    public void Parse_Charged_ReadsSubscriptionIdUserIdAndPeriodEnd()
+    public void Parse_Charged_ReadsSubscriptionIdPlanIdUserIdAndPeriodEnd()
     {
         var userId = Guid.NewGuid();
 
@@ -81,6 +82,7 @@ public sealed class RazorpayWebhookTests
 
         Assert.NotNull(parsed);
         Assert.Equal(GatewayId, parsed.GatewaySubscriptionId);
+        Assert.Equal(GatewayPlanId, parsed.GatewayPlanId);
         Assert.Equal(userId, parsed.UserId);
         Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(CurrentEnd), parsed.PeriodEnd);
     }
@@ -141,7 +143,7 @@ public sealed class RazorpayWebhookTests
     private static string Payload(string eventType, string notesJson, string currentEndJson) =>
         $$$$"""
         {"entity":"event","event":"{{{{eventType}}}}","payload":{"subscription":{"entity":
-        {"id":"{{{{GatewayId}}}}","status":"active","current_end":{{{{currentEndJson}}}},"notes":{{{{notesJson}}}} }} }}
+        {"id":"{{{{GatewayId}}}}","plan_id":"{{{{GatewayPlanId}}}}","status":"active","current_end":{{{{currentEndJson}}}},"notes":{{{{notesJson}}}} }} }}
         """;
 
     private static string Sign(string payload, string secret) =>

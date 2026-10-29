@@ -1,3 +1,4 @@
+using Billing.Application;
 using Catalog.Application;
 using Identity.Application;
 using Inquiries.Domain;
@@ -9,10 +10,14 @@ namespace Inquiries.Application;
 public sealed class CreateInquiryCommandHandler(
     IInquiryRepository inquiryRepository,
     IProductLookup productLookup,
-    ISellerDirectory sellerDirectory) : IRequestHandler<CreateInquiryCommand, Result<Guid>>
+    ISellerDirectory sellerDirectory,
+    IPlanEntitlements entitlements) : IRequestHandler<CreateInquiryCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateInquiryCommand request, CancellationToken ct)
     {
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.SellerId, ct))
+            return Result.PaymentRequired<Guid>(InquiryPlanMessages.InquiriesNeedPlan);
+
         var product = await productLookup.GetOwnerInfoAsync(request.ProductId, ct);
         if (product is null || !product.IsActive)
             return Result.NotFound<Guid>("Product not found.");

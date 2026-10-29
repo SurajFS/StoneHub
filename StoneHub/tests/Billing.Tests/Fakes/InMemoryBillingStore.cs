@@ -19,11 +19,12 @@ public sealed class InMemoryBillingStore : ISubscriptionRepository, IProcessedPa
         Task.FromResult(_subscriptions.FirstOrDefault(x => x.UserId == userId));
 
     public Task<Subscription?> GetByGatewaySubscriptionIdAsync(string gatewaySubscriptionId, CancellationToken ct = default) =>
-        Task.FromResult(_subscriptions.FirstOrDefault(x => x.GatewaySubscriptionId == gatewaySubscriptionId));
+        Task.FromResult(_subscriptions.FirstOrDefault(x =>
+            x.GatewaySubscriptionId == gatewaySubscriptionId || x.CheckoutGatewaySubscriptionId == gatewaySubscriptionId));
 
     public Task<IReadOnlyList<Subscription>> GetDueForExpiryAsync(DateTimeOffset now, CancellationToken ct = default) =>
         Task.FromResult<IReadOnlyList<Subscription>>(
-            _subscriptions.Where(x => x.IsPremiumActive && x.ExpiryDate <= now).ToList());
+            _subscriptions.Where(x => x.IsPaidActive && x.ExpiryDate <= now).ToList());
 
     public void Add(Subscription subscription) => _subscriptions.Add(subscription);
 

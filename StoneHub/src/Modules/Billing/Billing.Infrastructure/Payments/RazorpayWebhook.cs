@@ -33,7 +33,7 @@ public static class RazorpayWebhook
         return CryptographicOperations.FixedTimeEquals(expectedHex, actualHex);
     }
 
-    // Reads event -> payload.subscription.entity { id, current_end, notes.user_id }. Notes are an
+    // Reads event -> payload.subscription.entity { id, plan_id, current_end, notes.user_id }. Notes are an
     // object when set but an empty array when not, hence JsonDocument rather than typed records.
     public static PaymentEvent? Parse(string payload)
     {
@@ -49,7 +49,8 @@ public static class RazorpayWebhook
                 return new PaymentEvent(eventType, kind, null, null, null);
 
             var subscriptionId = TryGetString(entity, "id", out var id) ? id : null;
-            return new PaymentEvent(eventType, kind, subscriptionId, ReadUserId(entity), ReadPeriodEnd(entity));
+            var planId = TryGetString(entity, "plan_id", out var plan) ? plan : null;
+            return new PaymentEvent(eventType, kind, subscriptionId, ReadUserId(entity), ReadPeriodEnd(entity), planId);
         }
         catch (JsonException)
         {

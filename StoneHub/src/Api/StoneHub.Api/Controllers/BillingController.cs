@@ -2,6 +2,7 @@ using System.Net.Mime;
 using System.Security.Claims;
 using Billing.Application.Payments;
 using Billing.Application.Subscriptions;
+using Billing.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ public sealed class BillingController(IMediator mediator, ILogger<BillingControl
 {
     private const string OwnerRoles = "Seller,Wholesaler";
 
-    // The caller's own subscription (Free or Premium, with status/dates).
+    // The caller's own subscription (Free, Basic or Premium, with status/dates).
     [HttpGet("me")]
     public async Task<IActionResult> Me(CancellationToken ct)
     {
@@ -25,22 +26,28 @@ public sealed class BillingController(IMediator mediator, ILogger<BillingControl
         return result.ToActionResult();
     }
 
-    // A hosted Razorpay page to authorise auto-renewing Premium. Premium itself starts when the
-    // charge webhook arrives, not here.
+    // The paid plans with their prices for this caller (launch price only before a first payment).
+    [Authorize(Roles = OwnerRoles)]
+    [HttpGet("plans")]
+    public async Task<IActionResult> Plans(CancellationToken ct) =>
+        Ok(await mediator.Send(new GetPlansQuery(CallerUserId), ct));
+
+    // A hosted Razorpay page to authorise an auto-renewing paid plan. The plan itself starts when
+    // the charge webhook arrives, not here.
     [Authorize(Roles = OwnerRoles)]
     [HttpPost("checkout")]
-    public async Task<IActionResult> StartCheckout(CancellationToken ct)
+    public async Task<IActionResult> StartCheckout(StartCheckoutRequest request, CancellationToken ct)
     {
-        var result = await mediator.Send(new StartPremiumCheckoutCommand(CallerUserId), ct);
+        var result = await mediator.Send(new StartCheckoutCommand(CallerUserId, request.Plan), ct);
         return result.ToActionResult();
     }
 
-    // Stop auto-renewal; Premium continues to the end of the paid period.
+    // Stop auto-renewal; the plan continues to the end of the paid period.
     [Authorize(Roles = OwnerRoles)]
     [HttpPost("me/cancel")]
     public async Task<IActionResult> CancelRenewal(CancellationToken ct)
     {
-        var result = await mediator.Send(new CancelPremiumRenewalCommand(CallerUserId), ct);
+        var result = await mediator.Send(new CancelRenewalCommand(CallerUserId), ct);
         return result.IsSuccess ? NoContent() : result.ToActionResult();
     }
 
@@ -79,12 +86,12 @@ public sealed class BillingController(IMediator mediator, ILogger<BillingControl
         return result.ToActionResult();
     }
 
-    // Stand-in for a real payment gateway checkout (see task.md — deferred for now).
+    // A paid plan for a payment taken outside the gateway, or a granted period.
     [Authorize(Roles = "Admin")]
-    [HttpPost("admin/subscriptions/{userId:guid}/activate-premium")]
-    public async Task<IActionResult> ActivatePremium(Guid userId, ActivatePremiumRequest request, CancellationToken ct)
+    [HttpPost("admin/subscriptions/{userId:guid}/activate")]
+    public async Task<IActionResult> ActivatePlan(Guid userId, ActivatePlanRequest request, CancellationToken ct)
     {
-        var result = await mediator.Send(new ActivatePremiumCommand(userId, request.ExpiryDate, request.PaymentNotes), ct);
+        var result = await mediator.Send(new ActivatePlanCommand(userId, request.Plan, request.ExpiryDate, request.PaymentNotes), ct);
         return result.ToActionResult();
     }
 
@@ -99,4 +106,6 @@ public sealed class BillingController(IMediator mediator, ILogger<BillingControl
     private Guid CallerUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
 
-public sealed record ActivatePremiumRequest(DateTimeOffset ExpiryDate, string? PaymentNotes);
+public sealed record StartCheckoutRequest(SubscriptionPlan Plan);
+
+public sealed record ActivatePlanRequest(SubscriptionPlan Plan, DateTimeOffset ExpiryDate, string? PaymentNotes);

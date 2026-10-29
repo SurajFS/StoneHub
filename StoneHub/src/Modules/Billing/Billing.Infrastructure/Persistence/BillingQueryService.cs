@@ -36,5 +36,5 @@ public sealed class BillingQueryService(BillingDbContext dbContext) : IBillingQu
     }
 
     private static System.Linq.Expressions.Expression<Func<Subscription, SubscriptionDto>> ProjectToDto() => x =>
-        new SubscriptionDto(x.Id, x.UserId, x.Plan.ToString(), x.Status.ToString(), x.StartDate, x.ExpiryDate, x.PaymentNotes, x.CreatedAt, x.WillRenew);
+        new SubscriptionDto(x.Id, x.UserId, x.Plan.ToString(), x.Status.ToString(), x.StartDate, x.ExpiryDate, x.PaymentNotes, x.CreatedAt, x.WillRenew, x.HasEverPaid);
 }

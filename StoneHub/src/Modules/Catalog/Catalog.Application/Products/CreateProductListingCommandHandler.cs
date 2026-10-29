@@ -1,3 +1,4 @@
+using Billing.Application;
 using Catalog.Domain;
 using Identity.Application;
 using MediatR;
@@ -8,11 +9,16 @@ namespace Catalog.Application.Products;
 public sealed class CreateProductListingCommandHandler(
     IProductRepository productRepository,
     ICategoryRepository categoryRepository,
-    ISellerDirectory sellerDirectory)
+    ISellerDirectory sellerDirectory,
+    IPlanEntitlements entitlements)
     : IRequestHandler<CreateProductListingCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateProductListingCommand request, CancellationToken ct)
     {
+        // Free owners keep their existing listings but can't add new ones.
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.SellerId, ct))
+            return Result.PaymentRequired<Guid>("Adding listings needs a Basic or Premium plan.");
+
         var categoryCheck = await ProductCategoryValidation.EnsureValidAsync(
             categoryRepository, request.CategoryId, request.SubcategoryId, ct);
         if (categoryCheck.IsFailure)

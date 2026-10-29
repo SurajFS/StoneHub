@@ -28,7 +28,7 @@ public sealed class SubscriptionTests
         var subscription = Subscription.CreateFree(Guid.NewGuid());
         var expiry = DateTimeOffset.UtcNow.AddDays(30);
 
-        subscription.ActivatePremium(expiry, "Manual test activation");
+        subscription.ActivatePlan(SubscriptionPlan.Premium, expiry, "Manual test activation");
 
         Assert.Equal(SubscriptionPlan.Premium, subscription.Plan);
         Assert.Equal(SubscriptionStatus.Active, subscription.Status);
@@ -44,7 +44,7 @@ public sealed class SubscriptionTests
     public void Cancel_WhenPremium_RevertsToFreeCancelled_ClearsExpiryAndNotes_RaisesEvent()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ActivatePremium(DateTimeOffset.UtcNow.AddDays(30), "paid");
+        subscription.ActivatePlan(SubscriptionPlan.Premium, DateTimeOffset.UtcNow.AddDays(30), "paid");
         subscription.ClearDomainEvents();
 
         subscription.Cancel();
@@ -84,7 +84,7 @@ public sealed class SubscriptionTests
     public void ExpireIfDue_WhenPremiumNotYetExpired_ReturnsFalse_StaysPremium()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ActivatePremium(DateTimeOffset.UtcNow.AddDays(30), null);
+        subscription.ActivatePlan(SubscriptionPlan.Premium, DateTimeOffset.UtcNow.AddDays(30), null);
         subscription.ClearDomainEvents();
 
         var changed = subscription.ExpireIfDue(DateTimeOffset.UtcNow);
@@ -99,7 +99,7 @@ public sealed class SubscriptionTests
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
         var expiry = DateTimeOffset.UtcNow.AddSeconds(1);
-        subscription.ActivatePremium(expiry, "paid");
+        subscription.ActivatePlan(SubscriptionPlan.Premium, expiry, "paid");
         subscription.ClearDomainEvents();
 
         var changed = subscription.ExpireIfDue(expiry.AddMinutes(1));
@@ -117,7 +117,7 @@ public sealed class SubscriptionTests
     public void ExpireIfDue_WhenAlreadyCancelled_ReturnsFalse()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ActivatePremium(DateTimeOffset.UtcNow.AddSeconds(1), null);
+        subscription.ActivatePlan(SubscriptionPlan.Premium, DateTimeOffset.UtcNow.AddSeconds(1), null);
         subscription.Cancel();
         subscription.ClearDomainEvents();
 

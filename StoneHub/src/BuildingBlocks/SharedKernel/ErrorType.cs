@@ -11,5 +11,6 @@ public enum ErrorType
     Conflict,     // violates a uniqueness / state invariant (409)
     Unauthorized, // caller is not authenticated / bad credentials (401)
     Forbidden,    // authenticated but not allowed (403)
-    Unavailable   // a dependency the operation needs isn't configured / reachable right now (503)
+    Unavailable,  // a dependency the operation needs isn't configured / reachable right now (503)
+    PaymentRequired // the caller's plan doesn't include this feature; subscribing unlocks it (402)
 }

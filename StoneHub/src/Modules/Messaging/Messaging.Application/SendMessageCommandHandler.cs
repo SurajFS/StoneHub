@@ -1,3 +1,4 @@
+using Billing.Application;
 using MediatR;
 using Messaging.Application.Dtos;
 using Messaging.Domain;
@@ -7,7 +8,8 @@ namespace Messaging.Application;
 
 public sealed class SendMessageCommandHandler(
     IConversationRepository conversations,
-    IMessageRepository messages) : IRequestHandler<SendMessageCommand, Result<MessageDto>>
+    IMessageRepository messages,
+    IPlanEntitlements entitlements) : IRequestHandler<SendMessageCommand, Result<MessageDto>>
 {
     public async Task<Result<MessageDto>> Handle(SendMessageCommand request, CancellationToken ct)
     {
@@ -16,6 +18,8 @@ public sealed class SendMessageCommandHandler(
             return Result.NotFound<MessageDto>("Conversation not found.");
         if (!conversation.HasParticipant(request.SenderId))
             return Result.Forbidden<MessageDto>("You are not part of this conversation.");
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.SenderId, ct))
+            return Result.PaymentRequired<MessageDto>(PlanMessages.ChatNeedsPlan);
 
         var result = Message.Create(request.ConversationId, request.SenderId, request.Kind, request.Body, request.MediaUrl);
         if (result.IsFailure)

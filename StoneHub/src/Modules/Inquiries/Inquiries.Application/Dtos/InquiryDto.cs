@@ -10,4 +10,6 @@ public sealed record InquiryDto(
     decimal Quantity,
     string? Message,
     string Status,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    // The caller is a Free wholesaler: Message is withheld until they subscribe.
+    bool IsLocked = false);

@@ -1,3 +1,4 @@
+using Billing.Application;
 using MediatR;
 using Messaging.Application.Dtos;
 using Messaging.Domain;
@@ -10,7 +11,8 @@ public sealed record GetMessagesQuery(Guid ConversationId, Guid UserId, DateTime
 
 public sealed class GetMessagesQueryHandler(
     IConversationRepository conversations,
-    IMessagingQueryService queryService) : IRequestHandler<GetMessagesQuery, Result<IReadOnlyList<MessageDto>>>
+    IMessagingQueryService queryService,
+    IPlanEntitlements entitlements) : IRequestHandler<GetMessagesQuery, Result<IReadOnlyList<MessageDto>>>
 {
     private const int PageSize = 50;
 
@@ -21,6 +23,8 @@ public sealed class GetMessagesQueryHandler(
             return Result.NotFound<IReadOnlyList<MessageDto>>("Conversation not found.");
         if (!conversation.HasParticipant(request.UserId))
             return Result.Forbidden<IReadOnlyList<MessageDto>>("You are not part of this conversation.");
+        if (!await entitlements.CanUseOwnerFeaturesAsync(request.UserId, ct))
+            return Result.PaymentRequired<IReadOnlyList<MessageDto>>(PlanMessages.ChatNeedsPlan);
 
         var messages = await queryService.GetMessagesAsync(request.ConversationId, request.Since, PageSize, ct);
         return Result.Success(messages);

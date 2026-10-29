@@ -1,12 +1,17 @@
+using Billing.Application;
 using MediatR;
 using Messaging.Domain;
 using Notifications.Domain;
 
 namespace Notifications.Application.EventHandlers;
 
-public sealed class NewMessageReceivedEventHandler(IDeviceTokenRepository tokens, IPushSender pushSender)
+// A Free seller/wholesaler recipient is told a message arrived, but not what it says: they subscribe
+// to read it, so the push mustn't leak the text either.
+public sealed class NewMessageReceivedEventHandler(IDeviceTokenRepository tokens, IPushSender pushSender, IPlanEntitlements entitlements)
     : INotificationHandler<NewMessageReceivedEvent>
 {
+    private const string LockedPreview = "Subscribe to Basic or Premium to read and reply.";
+
     public async Task Handle(NewMessageReceivedEvent notification, CancellationToken ct)
     {
         var devices = await tokens.GetByUserIdAsync(notification.RecipientId, ct);
@@ -15,7 +20,9 @@ public sealed class NewMessageReceivedEventHandler(IDeviceTokenRepository tokens
 
         var message = new PushMessage(
             Title: $"New message from {notification.SenderName}",
-            Body: notification.Preview,
+            Body: await entitlements.CanUseOwnerFeaturesAsync(notification.RecipientId, ct)
+                ? notification.Preview
+                : LockedPreview,
             Data: new Dictionary<string, string>
             {
                 ["type"] = "message",

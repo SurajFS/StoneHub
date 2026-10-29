@@ -33,6 +33,9 @@ public static class BillingModuleExtensions
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IProcessedPaymentEventRepository, ProcessedPaymentEventRepository>();
         services.AddScoped<IBillingQueryService, BillingQueryService>();
+        services.AddScoped<IPlanEntitlements, PlanEntitlements>();
+        services.AddScoped<IPlanPricing, PlanPricing>();
+        services.Configure<PlanPricingSettings>(configuration.GetSection(PlanPricingSettings.SectionName));
 
         services.Configure<RazorpaySettings>(configuration.GetSection(RazorpaySettings.SectionName));
         services.AddHttpClient<IPaymentGateway, RazorpayGateway>((sp, client) =>

@@ -7,7 +7,7 @@ namespace Billing.Tests;
 
 // Admin activation records an offline payment. If the seller is also auto-renewing through the
 // gateway, that must stop first, or they're charged twice for the same Premium.
-public sealed class ActivatePremiumCommandHandlerTests
+public sealed class ActivatePlanCommandHandlerTests
 {
     private const string GatewayId = "sub_first";
 
@@ -20,7 +20,7 @@ public sealed class ActivatePremiumCommandHandlerTests
     public async Task Handle_WhenGatewayRenewing_CancelsAtGatewayNow_ThenActivatesWithoutRenewal()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ApplyGatewayCharge(GatewayId, DateTimeOffset.UtcNow.AddDays(30));
+        subscription.ApplyGatewayCharge(GatewayId, SubscriptionPlan.Basic, DateTimeOffset.UtcNow.AddDays(30));
         _store.Add(subscription);
 
         var result = await HandleAsync(subscription.UserId);
@@ -36,7 +36,7 @@ public sealed class ActivatePremiumCommandHandlerTests
     public async Task Handle_WhenRenewalAlreadyStopped_DoesNotCallGateway()
     {
         var subscription = Subscription.CreateFree(Guid.NewGuid());
-        subscription.ApplyGatewayCharge(GatewayId, DateTimeOffset.UtcNow.AddDays(30));
+        subscription.ApplyGatewayCharge(GatewayId, SubscriptionPlan.Basic, DateTimeOffset.UtcNow.AddDays(30));
         subscription.StopRenewal();
         _store.Add(subscription);
 
@@ -69,6 +69,6 @@ public sealed class ActivatePremiumCommandHandlerTests
     }
 
     private Task<SharedKernel.Result> HandleAsync(Guid userId) =>
-        new ActivatePremiumCommandHandler(_gateway, _store)
-            .Handle(new ActivatePremiumCommand(userId, AdminExpiry, "annual, paid offline"), CancellationToken.None);
+        new ActivatePlanCommandHandler(_gateway, _store)
+            .Handle(new ActivatePlanCommand(userId, SubscriptionPlan.Premium, AdminExpiry, "annual, paid offline"), CancellationToken.None);
 }

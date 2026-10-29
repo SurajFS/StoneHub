@@ -52,6 +52,14 @@ namespace Billing.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("CheckoutExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CheckoutGatewaySubscriptionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CheckoutPlan")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("CheckoutUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -65,6 +73,9 @@ namespace Billing.Infrastructure.Migrations
                     b.Property<string>("GatewaySubscriptionId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("HasEverPaid")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("PaymentNotes")
                         .HasMaxLength(500)
@@ -90,6 +101,9 @@ namespace Billing.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CheckoutGatewaySubscriptionId")
+                        .IsUnique();
 
                     b.HasIndex("GatewaySubscriptionId")
                         .IsUnique();

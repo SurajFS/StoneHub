@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Billing.Application.Payments;
+using Billing.Domain;
 using Microsoft.Extensions.Options;
 
 namespace Billing.Infrastructure.Payments;
@@ -10,21 +12,28 @@ namespace Billing.Infrastructure.Payments;
 // API: https://razorpay.com/docs/api/payments/subscriptions/
 public sealed class RazorpayGateway(HttpClient httpClient, IOptions<RazorpaySettings> options) : IPaymentGateway
 {
-    private static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
+    // Nulls are omitted so an absent offer_id isn't sent as an explicit null.
+    private static readonly JsonSerializerOptions Json = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
     private RazorpaySettings Settings => options.Value;
 
     public bool IsAvailable => Settings.IsConfigured;
 
-    public async Task<GatewayCheckout> CreateRecurringCheckoutAsync(Guid userId, CancellationToken ct = default)
+    public async Task<GatewayCheckout> CreateRecurringCheckoutAsync(
+        Guid userId, SubscriptionPlan plan, bool withLaunchOffer, CancellationToken ct = default)
     {
         var expiresAt = DateTimeOffset.UtcNow.AddHours(Settings.CheckoutLinkHours);
         var request = new CreateSubscriptionRequest(
-            Settings.PlanId,
+            Settings.PlanIdFor(plan),
             Settings.TotalBillingCycles,
             CustomerNotify: true,
             ExpireBy: expiresAt.ToUnixTimeSeconds(),
-            Notes: new Dictionary<string, string> { [RazorpayWebhook.UserIdNote] = userId.ToString() });
+            Notes: new Dictionary<string, string> { [RazorpayWebhook.UserIdNote] = userId.ToString() },
+            OfferId: withLaunchOffer ? Settings.LaunchOfferIdFor(plan) : null);
 
         using var response = await httpClient.PostAsJsonAsync("subscriptions", request, Json, ct);
         EnsureSuccess(response, "create subscription");
@@ -47,6 +56,8 @@ public sealed class RazorpayGateway(HttpClient httpClient, IOptions<RazorpaySett
 
     public PaymentEvent? ParseWebhook(string payload) => RazorpayWebhook.Parse(payload);
 
+    public SubscriptionPlan? PlanFor(string gatewayPlanId) => Settings.PlanFor(gatewayPlanId);
+
     private async Task CancelAsync(string gatewaySubscriptionId, bool atCycleEnd, CancellationToken ct)
     {
         var path = $"subscriptions/{Uri.EscapeDataString(gatewaySubscriptionId)}/cancel";
@@ -63,7 +74,8 @@ public sealed class RazorpayGateway(HttpClient httpClient, IOptions<RazorpaySett
     }
 
     private sealed record CreateSubscriptionRequest(
-        string PlanId, int TotalCount, bool CustomerNotify, long ExpireBy, IReadOnlyDictionary<string, string> Notes);
+        string PlanId, int TotalCount, bool CustomerNotify, long ExpireBy, IReadOnlyDictionary<string, string> Notes,
+        string? OfferId);
 
     private sealed record CancelSubscriptionRequest(bool CancelAtCycleEnd);
 
